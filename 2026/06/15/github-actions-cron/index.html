@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>用 GitHub Actions 给个人项目挂个免费定时任务 | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="我在做一个「AI 论文 &#x2F; 简讯雷达」：每天早上自动抓一批前沿内容，筛一遍，推到飞书。需求里有个看似不起眼、却把我卡住的点——它得每天定时跑，而我的 Mac 不可能一直开着。 挂个云服务器太重，本地 crontab 又依赖机器常开。最后发现最省事的答案就藏在我天天用的 GitHub 里：GitHub Actions 的定时触发。免费、零运维，仓库放着就行。这篇把我趟过的几个点记下来。 核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 GitHub Actions 给个人项目挂个免费定时任务">
+<meta property="og:url" content="http://example.com/2026/06/15/github-actions-cron/index.html">
+<meta property="og:site_name" content="Feo">
+<meta property="og:description" content="我在做一个「AI 论文 &#x2F; 简讯雷达」：每天早上自动抓一批前沿内容，筛一遍，推到飞书。需求里有个看似不起眼、却把我卡住的点——它得每天定时跑，而我的 Mac 不可能一直开着。 挂个云服务器太重，本地 crontab 又依赖机器常开。最后发现最省事的答案就藏在我天天用的 GitHub 里：GitHub Actions 的定时触发。免费、零运维，仓库放着就行。这篇把我趟过的几个点记下来。 核">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/projects/agent-notebook.svg">
+<meta property="article:published_time" content="2026-06-15T13:30:00.000Z">
+<meta property="article:modified_time" content="2026-06-15T13:30:00.000Z">
+<meta property="article:author" content="Feo">
+<meta property="article:tag" content="GitHub Actions">
+<meta property="article:tag" content="CI&#x2F;CD">
+<meta property="article:tag" content="自动化">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/projects/agent-notebook.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "用 GitHub Actions 给个人项目挂个免费定时任务",
+  "url": "http://example.com/2026/06/15/github-actions-cron/",
+  "image": "http://example.com/img/projects/agent-notebook.svg",
+  "datePublished": "2026-06-15T13:30:00.000Z",
+  "dateModified": "2026-06-15T13:30:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Feo",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2026/06/15/github-actions-cron/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A241F')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F4EFE7')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '用 GitHub Actions 给个人项目挂个免费定时任务',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css?v=20260511-zh2"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/projects/agent-notebook.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a><a class="nav-page-title" href="/"><span class="site-name">用 GitHub Actions 给个人项目挂个免费定时任务</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">用 GitHub Actions 给个人项目挂个免费定时任务</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-06-15T13:30:00.000Z" title="发表于 2026-06-15 21:30:00">2026-06-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-06-15T13:30:00.000Z" title="更新于 2026-06-15 21:30:00">2026-06-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/">技术笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>我在做一个「AI 论文 &#x2F; 简讯雷达」：每天早上自动抓一批前沿内容，筛一遍，推到飞书。需求里有个看似不起眼、却把我卡住的点——<strong>它得每天定时跑，而我的 Mac 不可能一直开着</strong>。</p>
+<p>挂个云服务器太重，本地 <code>crontab</code> 又依赖机器常开。最后发现最省事的答案就藏在我天天用的 GitHub 里：<strong>GitHub Actions 的定时触发</strong>。免费、零运维，仓库放着就行。这篇把我趟过的几个点记下来。</p>
+<h2 id="核心认知：代码根本不在你电脑上跑"><a href="#核心认知：代码根本不在你电脑上跑" class="headerlink" title="核心认知：代码根本不在你电脑上跑"></a>核心认知：代码根本不在你电脑上跑</h2><p>刚开始我有个误解，以为”定时任务”是 GitHub 远程戳我的电脑。其实反过来——<strong>GitHub 在它自己的云端临时机器（runner）上，拉下你的代码、跑完、销毁</strong>。</p>
+<p>所以”我 Mac 关机了它还照跑”一点都不神奇：因为压根不在我的 Mac 上跑。你的仓库对 Actions 来说就是一份”任务说明书”，runner 是云端一次性的临时工。</p>
+<h2 id="一个最小可用的-workflow"><a href="#一个最小可用的-workflow" class="headerlink" title="一个最小可用的 workflow"></a>一个最小可用的 workflow</h2><p>在仓库里建 <code>.github/workflows/radar.yml</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">daily-radar</span></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">schedule:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">cron:</span> <span class="string">&quot;0 1 * * *&quot;</span>   <span class="comment"># 见下文：这是 UTC 时间</span></span><br><span class="line">  <span class="attr">workflow_dispatch:</span>        <span class="comment"># 顺手加上：网页上能手动点一下触发，调试必备</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">run:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v4</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/setup-python@v5</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">python-version:</span> <span class="string">&quot;3.12&quot;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">run:</span> <span class="string">pip</span> <span class="string">install</span> <span class="string">-r</span> <span class="string">requirements.txt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">run:</span> <span class="string">python</span> <span class="string">-m</span> <span class="string">src.radar</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">          <span class="attr">API_KEY:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.API_KEY</span> <span class="string">&#125;&#125;</span>   <span class="comment"># 见下文：密钥别写死在代码里</span></span><br></pre></td></tr></table></figure>
+
+<p>推上去，它就活了。下面是我真正想记的几个坑。</p>
+<h2 id="坑一：cron-是-UTC，不是你的本地时间"><a href="#坑一：cron-是-UTC，不是你的本地时间" class="headerlink" title="坑一：cron 是 UTC，不是你的本地时间"></a>坑一：cron 是 UTC，不是你的本地时间</h2><p><code>cron</code> 那行的时间是 <strong>UTC</strong>，不是北京时间。我想要北京早上 9 点推送，就得减 8 小时：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0 1 * * *   →   UTC 01:00   →   北京 09:00</span><br></pre></td></tr></table></figure>
+
+<p>第一次没注意，推送莫名其妙晚了 8 小时，盯着日志看半天才反应过来。</p>
+<h2 id="坑二：别指望它准点"><a href="#坑二：别指望它准点" class="headerlink" title="坑二：别指望它准点"></a>坑二：别指望它准点</h2><p>Actions 的定时<strong>有延迟抖动</strong>，从几分钟到几十分钟都可能（云端高峰期排队）。所以它适合”每天早上”这种粗粒度需求，不适合”必须 9:00:00 整”的场景。我索性把推送文案写成”今日”而不是具体时刻，眼不见心不烦。</p>
+<h2 id="坑三：密钥不进代码，走-Secrets"><a href="#坑三：密钥不进代码，走-Secrets" class="headerlink" title="坑三：密钥不进代码，走 Secrets"></a>坑三：密钥不进代码，走 Secrets</h2><p>云端 runner 上没有你本地的 <code>.env</code>，而 API key 这种东西<strong>绝对不能</strong>硬写进代码推上去（公开仓库等于直接泄露）。正确做法是仓库 <code>Settings → Secrets</code> 里存好，workflow 里用 <code>$&#123;&#123; secrets.API_KEY &#125;&#125;</code> 注入成环境变量。</p>
+<p>对应地，代码读配置要走环境变量（<code>os.environ</code>），本地开发再用 <code>.env</code> 兜底。两边一套逻辑：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line">api_key = os.environ.get(<span class="string">&quot;API_KEY&quot;</span>)   <span class="comment"># 云端来自 Secrets，本地来自 .env</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="坑四：两个”它怎么不跑了”"><a href="#坑四：两个”它怎么不跑了”" class="headerlink" title="坑四：两个”它怎么不跑了”"></a>坑四：两个”它怎么不跑了”</h2><ul>
+<li><strong>定时 workflow 只在默认分支生效</strong>。你在别的分支改了 cron，不会触发，白等。</li>
+<li><strong>仓库 60 天没活动，定时任务会被自动停用</strong>。GitHub 怕僵尸仓库白烧资源。每天有 push 的项目不受影响；纯定时、自己不咋动的仓库要留意，去 Actions 页面点一下重新启用即可。</li>
+</ul>
+<h2 id="一个让我”开窍”的延伸用法"><a href="#一个让我”开窍”的延伸用法" class="headerlink" title="一个让我”开窍”的延伸用法"></a>一个让我”开窍”的延伸用法</h2><p>既然 runner 拉了你的代码、又能跑，那它<strong>顺手把产出 commit 回仓库</strong>也是顺理成章的。给 workflow 加一句权限，再加一步提交：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">permissions:</span></span><br><span class="line">  <span class="attr">contents:</span> <span class="string">write</span></span><br><span class="line"><span class="comment"># ...最后一步：</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">    git config user.name &quot;github-actions[bot]&quot;</span></span><br><span class="line"><span class="string">    git add data/</span></span><br><span class="line"><span class="string">    git diff --cached --quiet || git commit -m &quot;chore: 每日存档 $(date -u +%F)&quot;</span></span><br><span class="line"><span class="string">    git push</span></span><br></pre></td></tr></table></figure>
+
+<p>于是我每天的抓取结果自动沉淀进仓库，既是公开的数据存档，又顺带刷了 GitHub 绿格子——一举两得。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>个人项目的轻量自动化，GitHub Actions 基本够用，而且对<strong>公开仓库的标准 runner 不计费</strong>（私有仓库每月也有免费额度）。把”定时跑一段脚本”这件事从”得有台常开的机器”降级成”往仓库里放个 yaml”，对独立开发者特别友好。</p>
+<p>记住四件事就不太会翻车：<strong>时间是 UTC、不保证准点、密钥走 Secrets、默认分支 + 60 天活跃度</strong>。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Feo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2026/06/15/github-actions-cron/">http://example.com/2026/06/15/github-actions-cron/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Feo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/GitHub-Actions/">GitHub Actions</a><a class="post-meta__tags" href="/tags/CI-CD/">CI/CD</a><a class="post-meta__tags" href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化</a><a class="post-meta__tags" href="/tags/Python/">Python</a></div><div class="post-share"><div class="social-share" data-image="/img/projects/agent-notebook.svg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/06/14/hello-world/" title="第一篇笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">第一篇笔记</div></div><div class="info-2"><div class="info-item-1">这是 Feo 在这个站点里的第一篇笔记。 我希望这里成为一个安静的记录空间，用来放技术文章、项目日志、AI 实验和可复用的笔记。它不需要热闹，只需要在时间里保持有用和诚实。 我计划写什么 计算机视觉与透明物体位姿估计 AI Agent、LLM、Prompt 与 MCP 实验 项目总结和开发日志 之后值得反复回看的笔记  这个档案会如何成长慢慢来。多一点...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Feo</div><div class="author-info-description">Feo。代码、AI、视觉与安静记录。</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Feo-cat"><i class="fab fa-github"></i><span>GitHub</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 Feo 的个人笔记。内容还不多，但会慢慢认真长出来。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E8%AE%A4%E7%9F%A5%EF%BC%9A%E4%BB%A3%E7%A0%81%E6%A0%B9%E6%9C%AC%E4%B8%8D%E5%9C%A8%E4%BD%A0%E7%94%B5%E8%84%91%E4%B8%8A%E8%B7%91"><span class="toc-number">1.</span> <span class="toc-text">核心认知：代码根本不在你电脑上跑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E6%9C%80%E5%B0%8F%E5%8F%AF%E7%94%A8%E7%9A%84-workflow"><span class="toc-number">2.</span> <span class="toc-text">一个最小可用的 workflow</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9D%91%E4%B8%80%EF%BC%9Acron-%E6%98%AF-UTC%EF%BC%8C%E4%B8%8D%E6%98%AF%E4%BD%A0%E7%9A%84%E6%9C%AC%E5%9C%B0%E6%97%B6%E9%97%B4"><span class="toc-number">3.</span> <span class="toc-text">坑一：cron 是 UTC，不是你的本地时间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9D%91%E4%BA%8C%EF%BC%9A%E5%88%AB%E6%8C%87%E6%9C%9B%E5%AE%83%E5%87%86%E7%82%B9"><span class="toc-number">4.</span> <span class="toc-text">坑二：别指望它准点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9D%91%E4%B8%89%EF%BC%9A%E5%AF%86%E9%92%A5%E4%B8%8D%E8%BF%9B%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%B5%B0-Secrets"><span class="toc-number">5.</span> <span class="toc-text">坑三：密钥不进代码，走 Secrets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9D%91%E5%9B%9B%EF%BC%9A%E4%B8%A4%E4%B8%AA%E2%80%9D%E5%AE%83%E6%80%8E%E4%B9%88%E4%B8%8D%E8%B7%91%E4%BA%86%E2%80%9D"><span class="toc-number">6.</span> <span class="toc-text">坑四：两个”它怎么不跑了”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E8%AE%A9%E6%88%91%E2%80%9D%E5%BC%80%E7%AA%8D%E2%80%9D%E7%9A%84%E5%BB%B6%E4%BC%B8%E7%94%A8%E6%B3%95"><span class="toc-number">7.</span> <span class="toc-text">一个让我”开窍”的延伸用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">8.</span> <span class="toc-text">小结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/06/15/github-actions-cron/" title="用 GitHub Actions 给个人项目挂个免费定时任务"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="用 GitHub Actions 给个人项目挂个免费定时任务"/></a><div class="content"><a class="title" href="/2026/06/15/github-actions-cron/" title="用 GitHub Actions 给个人项目挂个免费定时任务">用 GitHub Actions 给个人项目挂个免费定时任务</a><time datetime="2026-06-15T13:30:00.000Z" title="发表于 2026-06-15 21:30:00">2026-06-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/14/hello-world/" title="第一篇笔记">第一篇笔记</a><time datetime="2026-06-14T15:52:18.616Z" title="发表于 2026-06-14 23:52:18">2026-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/17/Gin-note/" title="Gin 入门学习笔记：先把一个 API 跑起来"><img src="/img/projects/gin-note.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Gin 入门学习笔记：先把一个 API 跑起来"/></a><div class="content"><a class="title" href="/2026/05/17/Gin-note/" title="Gin 入门学习笔记：先把一个 API 跑起来">Gin 入门学习笔记：先把一个 API 跑起来</a><time datetime="2026-05-17T12:12:00.000Z" title="发表于 2026-05-17 20:12:00">2026-05-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/17/k8s-note/" title="Kubernetes（K8s）入门笔记"><img src="/img/projects/k8s-note.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes（K8s）入门笔记"/></a><div class="content"><a class="title" href="/2026/05/17/k8s-note/" title="Kubernetes（K8s）入门笔记">Kubernetes（K8s）入门笔记</a><time datetime="2026-05-17T10:52:37.000Z" title="发表于 2026-05-17 18:52:37">2026-05-17</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

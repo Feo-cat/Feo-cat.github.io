@@ -1,0 +1,274 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Gin 入门学习笔记：先把一个 API 跑起来 | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="最近在补 Go 后端相关的东西，Gin 算是绕不开的一站。它不像 Spring 那样一上来就有很多概念，也不像直接写 net&#x2F;http 那么“原生态”，整体感觉是：先让 API 跑起来，再慢慢把路由、参数、JSON 和中间件这些东西串上。 这篇就当作我的第一轮 Gin 学习记录，不追求把所有能力一次讲完，先把我觉得最核心、最容易马上用起来的部分整理清楚。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gin 入门学习笔记：先把一个 API 跑起来">
+<meta property="og:url" content="http://example.com/2026/05/17/Gin-note/index.html">
+<meta property="og:site_name" content="Feo">
+<meta property="og:description" content="最近在补 Go 后端相关的东西，Gin 算是绕不开的一站。它不像 Spring 那样一上来就有很多概念，也不像直接写 net&#x2F;http 那么“原生态”，整体感觉是：先让 API 跑起来，再慢慢把路由、参数、JSON 和中间件这些东西串上。 这篇就当作我的第一轮 Gin 学习记录，不追求把所有能力一次讲完，先把我觉得最核心、最容易马上用起来的部分整理清楚。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/projects/gin-note.svg">
+<meta property="article:published_time" content="2026-05-17T12:12:00.000Z">
+<meta property="article:modified_time" content="2026-05-17T13:44:24.000Z">
+<meta property="article:author" content="Feo">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="Gin">
+<meta property="article:tag" content="Web开发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/projects/gin-note.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Gin 入门学习笔记：先把一个 API 跑起来",
+  "url": "http://example.com/2026/05/17/Gin-note/",
+  "image": "http://example.com/img/projects/gin-note.svg",
+  "datePublished": "2026-05-17T12:12:00.000Z",
+  "dateModified": "2026-05-17T13:44:24.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Feo",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2026/05/17/Gin-note/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A241F')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F4EFE7')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Gin 入门学习笔记：先把一个 API 跑起来',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css?v=20260511-zh2"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/projects/gin-note.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a><a class="nav-page-title" href="/"><span class="site-name">Gin 入门学习笔记：先把一个 API 跑起来</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Gin 入门学习笔记：先把一个 API 跑起来</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-05-17T12:12:00.000Z" title="发表于 2026-05-17 20:12:00">2026-05-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-05-17T13:44:24.000Z" title="更新于 2026-05-17 21:44:24">2026-05-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/">技术笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>最近在补 Go 后端相关的东西，Gin 算是绕不开的一站。它不像 Spring 那样一上来就有很多概念，也不像直接写 <code>net/http</code> 那么“原生态”，整体感觉是：先让 API 跑起来，再慢慢把路由、参数、JSON 和中间件这些东西串上。</p>
+<p>这篇就当作我的第一轮 Gin 学习记录，不追求把所有能力一次讲完，先把我觉得最核心、最容易马上用起来的部分整理清楚。</p>
+<span id="more"></span>
+
+<h2 id="我对-Gin-的第一印象"><a href="#我对-Gin-的第一印象" class="headerlink" title="我对 Gin 的第一印象"></a>我对 Gin 的第一印象</h2><p>Gin 是基于 Go 标准库 <code>net/http</code> 封装出来的 Web 框架。它主要解决的是这些问题：</p>
+<ul>
+<li>路由写起来更直观</li>
+<li>请求参数获取更方便</li>
+<li>JSON 返回更顺手</li>
+<li>中间件可以统一处理日志、鉴权、异常恢复等逻辑</li>
+<li>项目稍微变大之后，可以用路由分组把接口组织起来</li>
+</ul>
+<p>如果只写一个简单接口，<code>net/http</code> 也能完成；但当接口多起来以后，Gin 的结构会更清晰。这也是我决定先学 Gin 的原因：它足够轻，又离真实项目足够近。</p>
+<h2 id="创建一个最小项目"><a href="#创建一个最小项目" class="headerlink" title="创建一个最小项目"></a>创建一个最小项目</h2><p>我先从一个干净目录开始：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go mod init gin-demo</span><br><span class="line">go get github.com/gin-gonic/gin</span><br></pre></td></tr></table></figure>
+
+<p>然后写一个最小的 <code>main.go</code>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;net/http&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&quot;github.com/gin-gonic/gin&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    r := gin.Default()</span><br><span class="line"></span><br><span class="line">    r.GET(<span class="string">&quot;/&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">            <span class="string">&quot;message&quot;</span>: <span class="string">&quot;hello gin&quot;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    r.Run(<span class="string">&quot;:8080&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go run main.go</span><br></pre></td></tr></table></figure>
+
+<p>访问：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://localhost:8080</span><br></pre></td></tr></table></figure>
+
+<p>能看到下面这样的返回，就说明 Gin 已经跑起来了：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;hello gin&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里我顺手记了一个点：<code>gin.Default()</code> 默认带了 <code>Logger</code> 和 <code>Recovery</code> 两个中间件。前者会打印请求日志，后者会在 panic 时恢复请求，避免服务直接崩掉。如果想从完全干净的引擎开始，可以用 <code>gin.New()</code>。</p>
+<h2 id="路由：先把-URL-和处理函数对应起来"><a href="#路由：先把-URL-和处理函数对应起来" class="headerlink" title="路由：先把 URL 和处理函数对应起来"></a>路由：先把 URL 和处理函数对应起来</h2><p>Gin 的路由写法比较直接：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">r.GET(<span class="string">&quot;/users&quot;</span>, listUsers)</span><br><span class="line">r.POST(<span class="string">&quot;/users&quot;</span>, createUser)</span><br><span class="line">r.PUT(<span class="string">&quot;/users/:id&quot;</span>, updateUser)</span><br><span class="line">r.DELETE(<span class="string">&quot;/users/:id&quot;</span>, deleteUser)</span><br></pre></td></tr></table></figure>
+
+<p>我的理解是，路由就是在回答一个问题：某个 HTTP 方法访问某个路径时，应该交给哪个函数处理。</p>
+<p>比如这个接口：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">r.GET(<span class="string">&quot;/users/:id&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    id := c.Param(<span class="string">&quot;id&quot;</span>)</span><br><span class="line"></span><br><span class="line">    c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">        <span class="string">&quot;id&quot;</span>: id,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>访问 <code>/users/1001</code> 时，<code>:id</code> 会被解析成 <code>1001</code>。这种写法适合“资源 ID 在路径里”的场景，比如用户详情、文章详情、订单详情。</p>
+<h2 id="参数：Path、Query-和-Body-分开看"><a href="#参数：Path、Query-和-Body-分开看" class="headerlink" title="参数：Path、Query 和 Body 分开看"></a>参数：Path、Query 和 Body 分开看</h2><p>刚开始学 Web 框架时，我最容易混的是参数来源。现在我会把它们分成三类：</p>
+<ul>
+<li>Path 参数：放在 URL 路径里，比如 <code>/users/1001</code></li>
+<li>Query 参数：放在 <code>?</code> 后面，比如 <code>/search?keyword=gin</code></li>
+<li>Body 参数：放在请求体里，常见于 POST&#x2F;PUT 的 JSON</li>
+</ul>
+<p>Query 参数可以这样取：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">r.GET(<span class="string">&quot;/search&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    keyword := c.Query(<span class="string">&quot;keyword&quot;</span>)</span><br><span class="line">    page := c.DefaultQuery(<span class="string">&quot;page&quot;</span>, <span class="string">&quot;1&quot;</span>)</span><br><span class="line"></span><br><span class="line">    c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">        <span class="string">&quot;keyword&quot;</span>: keyword,</span><br><span class="line">        <span class="string">&quot;page&quot;</span>:    page,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这里 <code>Query</code> 取不到时会返回空字符串，<code>DefaultQuery</code> 可以给一个默认值。对于分页、搜索、筛选这类接口，Query 参数很常用。</p>
+<h2 id="JSON：不要只会接，也要处理错误"><a href="#JSON：不要只会接，也要处理错误" class="headerlink" title="JSON：不要只会接，也要处理错误"></a>JSON：不要只会接，也要处理错误</h2><p>一开始我写 JSON 接收时，只关注“能不能把数据绑定到结构体上”：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> CreateUserRequest <span class="keyword">struct</span> &#123;</span><br><span class="line">    Name <span class="type">string</span> <span class="string">`json:&quot;name&quot;`</span></span><br><span class="line">    Age  <span class="type">int</span>    <span class="string">`json:&quot;age&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>后来发现，请求体格式不对、字段类型不对时，如果不处理错误，接口会显得很粗糙。所以我更倾向于这样写：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">r.POST(<span class="string">&quot;/users&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> req CreateUserRequest</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err := c.ShouldBindJSON(&amp;req); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        c.JSON(http.StatusBadRequest, gin.H&#123;</span><br><span class="line">            <span class="string">&quot;message&quot;</span>: <span class="string">&quot;invalid request body&quot;</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: req.Name,</span><br><span class="line">        <span class="string">&quot;age&quot;</span>:  req.Age,</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这里用的是 <code>ShouldBindJSON</code>。它不会自动中断请求，而是把错误交给我自己处理。对学习阶段来说，这种写法更能帮助理解请求处理流程。</p>
+<h2 id="返回-JSON：尽量保持结构稳定"><a href="#返回-JSON：尽量保持结构稳定" class="headerlink" title="返回 JSON：尽量保持结构稳定"></a>返回 JSON：尽量保持结构稳定</h2><p>Gin 返回 JSON 很方便：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">c.JSON(http.StatusOK, gin.H&#123;</span><br><span class="line">    <span class="string">&quot;code&quot;</span>:    <span class="number">0</span>,</span><br><span class="line">    <span class="string">&quot;message&quot;</span>: <span class="string">&quot;success&quot;</span>,</span><br><span class="line">    <span class="string">&quot;data&quot;</span>: gin.H&#123;</span><br><span class="line">        <span class="string">&quot;id&quot;</span>:   <span class="number">1001</span>,</span><br><span class="line">        <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Tom&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>我现在会尽量让接口响应保持固定结构，比如 <code>code</code>、<code>message</code>、<code>data</code>。即使只是练习项目，也能提前形成一点 API 设计习惯。否则每个接口都随手返回不同格式，前端或调用方会很难受。</p>
+<h2 id="中间件：把公共逻辑从业务接口里拿出去"><a href="#中间件：把公共逻辑从业务接口里拿出去" class="headerlink" title="中间件：把公共逻辑从业务接口里拿出去"></a>中间件：把公共逻辑从业务接口里拿出去</h2><p>中间件是我觉得 Gin 里比较关键的概念。它适合放那些“每个请求都可能要做，但又不属于具体业务”的逻辑。</p>
+<p>比如简单记录请求耗时：</p>
+<p>如果单独运行下面这段示例，需要额外导入 <code>fmt</code> 和 <code>time</code>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">CostLogger</span><span class="params">()</span></span> gin.HandlerFunc &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">        start := time.Now()</span><br><span class="line"></span><br><span class="line">        c.Next()</span><br><span class="line"></span><br><span class="line">        cost := time.Since(start)</span><br><span class="line">        path := c.Request.URL.Path</span><br><span class="line">        method := c.Request.Method</span><br><span class="line"></span><br><span class="line">        fmt.Printf(<span class="string">&quot;%s %s cost=%s\n&quot;</span>, method, path, cost)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用时挂到路由引擎上：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r.Use(CostLogger())</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的核心是 <code>c.Next()</code>：它会继续执行后面的中间件和真正的业务处理函数。<code>c.Next()</code> 前面的代码可以理解为“请求进入时做的事”，后面的代码可以理解为“请求处理完之后做的事”。</p>
+<p>常见中间件大概有这些：</p>
+<ul>
+<li>日志记录</li>
+<li>跨域处理</li>
+<li>JWT 鉴权</li>
+<li>请求限流</li>
+<li>统一错误处理</li>
+<li>panic 恢复</li>
+</ul>
+<h2 id="路由分组：让接口看起来有边界"><a href="#路由分组：让接口看起来有边界" class="headerlink" title="路由分组：让接口看起来有边界"></a>路由分组：让接口看起来有边界</h2><p>接口变多以后，所有路由都堆在 <code>main.go</code> 里会很乱。Gin 的路由分组可以先解决一部分组织问题：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">api := r.Group(<span class="string">&quot;/api&quot;</span>)</span><br><span class="line"></span><br><span class="line">users := api.Group(<span class="string">&quot;/users&quot;</span>)</span><br><span class="line">&#123;</span><br><span class="line">    users.GET(<span class="string">&quot;&quot;</span>, listUsers)</span><br><span class="line">    users.POST(<span class="string">&quot;&quot;</span>, createUser)</span><br><span class="line">    users.GET(<span class="string">&quot;/:id&quot;</span>, getUser)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样最终路径会变成：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET  /api/users</span><br><span class="line">POST /api/users</span><br><span class="line">GET  /api/users/:<span class="built_in">id</span></span><br></pre></td></tr></table></figure>
+
+<p>我比较喜欢这种写法，因为它能让“模块边界”直接体现在路由上。以后加鉴权时，也可以只给某个分组挂中间件。</p>
+<h2 id="项目结构：先简单，别太早工程化"><a href="#项目结构：先简单，别太早工程化" class="headerlink" title="项目结构：先简单，别太早工程化"></a>项目结构：先简单，别太早工程化</h2><p>很多教程一开始就给出很完整的目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gin-demo/</span><br><span class="line">├── config/</span><br><span class="line">├── controller/</span><br><span class="line">├── middleware/</span><br><span class="line">├── model/</span><br><span class="line">├── router/</span><br><span class="line">└── service/</span><br></pre></td></tr></table></figure>
+
+<p>这个结构没问题，但我觉得初学时不用一上来就拆这么细。我的做法是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gin-demo/</span><br><span class="line">├── main.go</span><br><span class="line">├── handlers/</span><br><span class="line">├── middleware/</span><br><span class="line">└── models/</span><br></pre></td></tr></table></figure>
+
+<p>等业务真的变复杂，再继续拆 <code>service</code>、<code>repository</code>、<code>config</code>。否则代码还没几行，目录先长出来一堆，反而会影响理解。</p>
+<h2 id="这一轮学完后的待补清单"><a href="#这一轮学完后的待补清单" class="headerlink" title="这一轮学完后的待补清单"></a>这一轮学完后的待补清单</h2><p>目前这篇只算是把 Gin 的主线跑通了。后面我还想继续补这些内容：</p>
+<ol>
+<li>参数校验，比如 <code>binding:&quot;required&quot;</code></li>
+<li>全局错误处理和统一响应格式</li>
+<li>JWT 登录鉴权</li>
+<li>GORM 连接 MySQL</li>
+<li>Redis 缓存常见用法</li>
+<li>Docker 部署一个 Gin 服务</li>
+<li>用 <code>httptest</code> 给接口写测试</li>
+</ol>
+<p>这些才更接近真实后端项目。不过第一步还是先让路由、参数、JSON、中间件这些基础概念变熟。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>Gin 给我的感觉是：它没有把 Go 的 Web 开发包得太厚，但又补上了日常写 API 时最需要的便利性。</p>
+<p>这一轮我重点记住了四件事：</p>
+<ul>
+<li><code>gin.Default()</code> 可以快速启动一个带基础中间件的服务</li>
+<li>路由负责把 HTTP 方法和 URL 映射到处理函数</li>
+<li>参数要分清 Path、Query 和 Body</li>
+<li>中间件适合处理日志、鉴权、恢复、限流这类公共逻辑</li>
+</ul>
+<p>等这些基础写顺手之后，再去接数据库、鉴权和部署，心里会稳很多。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Feo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2026/05/17/Gin-note/">http://example.com/2026/05/17/Gin-note/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Feo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Golang/">Golang</a><a class="post-meta__tags" href="/tags/Gin/">Gin</a><a class="post-meta__tags" href="/tags/Web%E5%BC%80%E5%8F%91/">Web开发</a></div><div class="post-share"><div class="social-share" data-image="/img/projects/gin-note.svg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/06/14/hello-world/" title="第一篇笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">第一篇笔记</div></div><div class="info-2"><div class="info-item-1">这是 Feo 在这个站点里的第一篇笔记。 我希望这里成为一个安静的记录空间，用来放技术文章、项目日志、AI 实验和可复用的笔记。它不需要热闹，只需要在时间里保持有用和诚实。 我计划写什么 计算机视觉与透明物体位姿估计 AI Agent、LLM、Prompt 与 MCP 实验 项目总结和开发日志 之后值得反复回看的笔记  这个档案会如何成长慢慢来。多一点...</div></div></div></a><a class="pagination-related" href="/2026/05/17/k8s-note/" title="Kubernetes（K8s）入门笔记"><img class="cover" src="/img/projects/k8s-note.svg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Kubernetes（K8s）入门笔记</div></div><div class="info-2"><div class="info-item-1">Kubernetes（简称 K8s）是目前最主流的容器编排平台，主要用于管理 Docker 容器，实现自动部署、扩容、服务发现和高可用。 Kubernetes 是什么Kubernetes 是 Google 开源的容器编排系统，用于自动化部署、扩展和管理容器化应用。 简单来说：  Docker 负责“运行容器” Kubernetes 负责“管理容器”  ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Feo</div><div class="author-info-description">Feo。代码、AI、视觉与安静记录。</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Feo-cat"><i class="fab fa-github"></i><span>GitHub</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 Feo 的个人笔记。内容还不多，但会慢慢认真长出来。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%91%E5%AF%B9-Gin-%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8D%B0%E8%B1%A1"><span class="toc-number">1.</span> <span class="toc-text">我对 Gin 的第一印象</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%9C%80%E5%B0%8F%E9%A1%B9%E7%9B%AE"><span class="toc-number">2.</span> <span class="toc-text">创建一个最小项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%EF%BC%9A%E5%85%88%E6%8A%8A-URL-%E5%92%8C%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0%E5%AF%B9%E5%BA%94%E8%B5%B7%E6%9D%A5"><span class="toc-number">3.</span> <span class="toc-text">路由：先把 URL 和处理函数对应起来</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%EF%BC%9APath%E3%80%81Query-%E5%92%8C-Body-%E5%88%86%E5%BC%80%E7%9C%8B"><span class="toc-number">4.</span> <span class="toc-text">参数：Path、Query 和 Body 分开看</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JSON%EF%BC%9A%E4%B8%8D%E8%A6%81%E5%8F%AA%E4%BC%9A%E6%8E%A5%EF%BC%8C%E4%B9%9F%E8%A6%81%E5%A4%84%E7%90%86%E9%94%99%E8%AF%AF"><span class="toc-number">5.</span> <span class="toc-text">JSON：不要只会接，也要处理错误</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%94%E5%9B%9E-JSON%EF%BC%9A%E5%B0%BD%E9%87%8F%E4%BF%9D%E6%8C%81%E7%BB%93%E6%9E%84%E7%A8%B3%E5%AE%9A"><span class="toc-number">6.</span> <span class="toc-text">返回 JSON：尽量保持结构稳定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E9%97%B4%E4%BB%B6%EF%BC%9A%E6%8A%8A%E5%85%AC%E5%85%B1%E9%80%BB%E8%BE%91%E4%BB%8E%E4%B8%9A%E5%8A%A1%E6%8E%A5%E5%8F%A3%E9%87%8C%E6%8B%BF%E5%87%BA%E5%8E%BB"><span class="toc-number">7.</span> <span class="toc-text">中间件：把公共逻辑从业务接口里拿出去</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E5%88%86%E7%BB%84%EF%BC%9A%E8%AE%A9%E6%8E%A5%E5%8F%A3%E7%9C%8B%E8%B5%B7%E6%9D%A5%E6%9C%89%E8%BE%B9%E7%95%8C"><span class="toc-number">8.</span> <span class="toc-text">路由分组：让接口看起来有边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84%EF%BC%9A%E5%85%88%E7%AE%80%E5%8D%95%EF%BC%8C%E5%88%AB%E5%A4%AA%E6%97%A9%E5%B7%A5%E7%A8%8B%E5%8C%96"><span class="toc-number">9.</span> <span class="toc-text">项目结构：先简单，别太早工程化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%99%E4%B8%80%E8%BD%AE%E5%AD%A6%E5%AE%8C%E5%90%8E%E7%9A%84%E5%BE%85%E8%A1%A5%E6%B8%85%E5%8D%95"><span class="toc-number">10.</span> <span class="toc-text">这一轮学完后的待补清单</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">11.</span> <span class="toc-text">小结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/06/15/github-actions-cron/" title="用 GitHub Actions 给个人项目挂个免费定时任务"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="用 GitHub Actions 给个人项目挂个免费定时任务"/></a><div class="content"><a class="title" href="/2026/06/15/github-actions-cron/" title="用 GitHub Actions 给个人项目挂个免费定时任务">用 GitHub Actions 给个人项目挂个免费定时任务</a><time datetime="2026-06-15T13:30:00.000Z" title="发表于 2026-06-15 21:30:00">2026-06-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/14/hello-world/" title="第一篇笔记">第一篇笔记</a><time datetime="2026-06-14T15:52:18.616Z" title="发表于 2026-06-14 23:52:18">2026-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/17/Gin-note/" title="Gin 入门学习笔记：先把一个 API 跑起来"><img src="/img/projects/gin-note.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Gin 入门学习笔记：先把一个 API 跑起来"/></a><div class="content"><a class="title" href="/2026/05/17/Gin-note/" title="Gin 入门学习笔记：先把一个 API 跑起来">Gin 入门学习笔记：先把一个 API 跑起来</a><time datetime="2026-05-17T12:12:00.000Z" title="发表于 2026-05-17 20:12:00">2026-05-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/17/k8s-note/" title="Kubernetes（K8s）入门笔记"><img src="/img/projects/k8s-note.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes（K8s）入门笔记"/></a><div class="content"><a class="title" href="/2026/05/17/k8s-note/" title="Kubernetes（K8s）入门笔记">Kubernetes（K8s）入门笔记</a><time datetime="2026-05-17T10:52:37.000Z" title="发表于 2026-05-17 18:52:37">2026-05-17</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

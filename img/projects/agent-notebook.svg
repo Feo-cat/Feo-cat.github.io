@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">AI agent notebook screenshot placeholder</title>
+  <desc id="desc">A calm research notebook mockup for LLM agent experiments.</desc>
+  <rect width="1200" height="760" fill="#f4efe7"/>
+  <rect x="82" y="76" width="1036" height="608" rx="12" fill="#fffaf1" stroke="#d8c8b6" stroke-width="2"/>
+  <rect x="132" y="126" width="230" height="508" rx="8" fill="#f0e6d8"/>
+  <rect x="172" y="172" width="126" height="14" rx="7" fill="#7c5a3d"/>
+  <rect x="172" y="232" width="142" height="10" rx="5" fill="#b7a38e"/>
+  <rect x="172" y="270" width="96" height="10" rx="5" fill="#c9b59d"/>
+  <rect x="172" y="308" width="158" height="10" rx="5" fill="#c9b59d"/>
+  <rect x="420" y="132" width="520" height="34" rx="4" fill="#3f352d"/>
+  <rect x="420" y="214" width="620" height="84" rx="8" fill="#f4efe7" stroke="#d8c8b6"/>
+  <circle cx="466" cy="256" r="18" fill="#7c5a3d"/>
+  <rect x="506" y="240" width="372" height="10" rx="5" fill="#b7a38e"/>
+  <rect x="506" y="270" width="256" height="10" rx="5" fill="#d8c8b6"/>
+  <rect x="420" y="336" width="620" height="196" rx="8" fill="#f4efe7" stroke="#d8c8b6"/>
+  <rect x="466" y="386" width="472" height="12" rx="6" fill="#b7a38e"/>
+  <rect x="466" y="424" width="328" height="12" rx="6" fill="#d8c8b6"/>
+  <rect x="466" y="462" width="398" height="12" rx="6" fill="#d8c8b6"/>
+</svg>

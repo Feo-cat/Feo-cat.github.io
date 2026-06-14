@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>项目 | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="项目     一些小系统、研究原型，以及值得记录的工具。     每个项目都会尽量保留完整上下文：它解决什么问题、用了什么技术、代码在哪里，以及我从中学到了什么。                   计算机视觉       透明物体位姿估计       围绕透明物体位姿估计、3D 边界框和多视角视频评估所做的研究与验证流程。                Python">
+<meta property="og:type" content="website">
+<meta property="og:title" content="项目">
+<meta property="og:url" content="http://example.com/projects/index.html">
+<meta property="og:site_name" content="Feo">
+<meta property="og:description" content="项目     一些小系统、研究原型，以及值得记录的工具。     每个项目都会尽量保留完整上下文：它解决什么问题、用了什么技术、代码在哪里，以及我从中学到了什么。                   计算机视觉       透明物体位姿估计       围绕透明物体位姿估计、3D 边界框和多视角视频评估所做的研究与验证流程。                Python">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:published_time" content="2026-05-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-14T15:52:18.617Z">
+<meta property="article:author" content="Feo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/projects/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A241F')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F4EFE7')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '项目',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="stylesheet" href="/css/custom.css?v=20260511-zh2"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">项目</h1></header><main class="layout hide-aside" id="content-inner"><div id="page"><div class="page-title">项目</div><div class="container" id="article-container"><div class="module-page projects-page">
+  <section class="module-hero">
+    <p class="eyebrow">项目</p>
+    <h1>一些小系统、研究原型，以及值得记录的工具。</h1>
+    <p class="lede">每个项目都会尽量保留完整上下文：它解决什么问题、用了什么技术、代码在哪里，以及我从中学到了什么。</p>
+  </section>
+
+  <section class="project-case" id="transparent-object-pose">
+    <div class="project-copy">
+      <p class="eyebrow">计算机视觉</p>
+      <h2>透明物体位姿估计</h2>
+      <p>围绕透明物体位姿估计、3D 边界框和多视角视频评估所做的研究与验证流程。</p>
+      <ul class="tech-list">
+        <li>Python</li>
+        <li>PyTorch</li>
+        <li>OpenCV</li>
+        <li>3D 边界框</li>
+      </ul>
+      <p class="project-summary">重点：让验证结果更容易查看、比较和解释。下一步会补充更清晰的实验日志和可视化报告。</p>
+      <a class="text-link" href="https://github.com/Feo-cat" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <img src="/img/projects/pose-lab.svg" alt="透明物体位姿估计项目截图">
+  </section>
+
+  <section class="project-case" id="editorial-blog-system">
+    <div class="project-copy">
+      <p class="eyebrow">网站 / 写作系统</p>
+      <h2>个人博客系统</h2>
+      <p>Feo 的个人发布系统，被重新设计成一个温暖、安静、偏出版物气质的阅读空间。</p>
+      <ul class="tech-list">
+        <li>静态站点</li>
+        <li>出版物界面</li>
+        <li>CSS</li>
+        <li>信息架构</li>
+      </ul>
+      <p class="project-summary">重点：保留 Butterfly 原有功能，同时构建更安静的首页、模块化知识页面和长文阅读样式。</p>
+      <a class="text-link" href="https://github.com/Feo-cat/Feo-cat.github.io" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <img src="/img/projects/blog-system.svg" alt="个人博客系统截图">
+  </section>
+
+  <section class="project-case" id="agent-notebook">
+    <div class="project-copy">
+      <p class="eyebrow">AI 实验室</p>
+      <h2>Agent 笔记本</h2>
+      <p>一个轻量的实验记录空间，用来沉淀 AI Agent、Prompt、MCP 和 LLM 工作流。</p>
+      <ul class="tech-list">
+        <li>LLM</li>
+        <li>MCP</li>
+        <li>Prompt 设计</li>
+        <li>评估</li>
+      </ul>
+      <p class="project-summary">重点：把零散对话和临时脚本整理成可以复用的模式。</p>
+      <a class="text-link" href="https://github.com/Feo-cat" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <img src="/img/projects/agent-notebook.svg" alt="AI Agent 笔记本截图">
+  </section>
+</div>
+</div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
