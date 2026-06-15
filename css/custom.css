@@ -998,3 +998,33 @@ a:visited {
     display: none;
   }
 }
+
+/* ============================================================
+   v3（2026-06-15）：文章页（/blog/）紧凑页眉。
+   原全屏横幅（~100vh 的「自我介绍」）压成窄条，保留打字机副标题。
+   仅影响 .full_page（即 /blog/ 列表及其分页），首页 / 与其它页不受影响。
+   ============================================================ */
+#page-header.full_page {
+  height: auto;
+  min-height: 280px;
+}
+#page-header.full_page #site-title {
+  font-size: clamp(1.9rem, 4.6vw, 3rem);
+  line-height: 1.1;
+}
+#page-header.full_page #site-subtitle {
+  margin-top: 12px;
+  font-size: clamp(0.95rem, 1.6vw, 1.18rem);
+}
+#page-header.full_page::after {
+  content: none;          /* 去掉为高横幅设计的中线 */
+}
+#page-header.full_page #scroll-down {
+  display: none;          /* 窄条不需要"向下滚"箭头 */
+}
+@media screen and (max-width: 768px) {
+  #page-header.full_page {
+    height: auto !important;
+    min-height: 220px;
+  }
+}
