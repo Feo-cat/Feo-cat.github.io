@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" fill="none" role="img" aria-label="Gin 抽象封面">
+  <rect width="800" height="480" fill="#f1ece2"/>
+  <circle cx="250" cy="244" r="150" fill="#c15f3c" opacity="0.9"/>
+  <circle cx="300" cy="210" r="150" fill="#f1ece2" opacity="0.5"/>
+  <path d="M-20 360 Q 300 384 430 244 T 840 140" stroke="#a8472a" stroke-width="3" opacity="0.55"/>
+  <path d="M-20 424 Q 330 446 488 300 T 840 224" stroke="#d4a27f" stroke-width="3" opacity="0.85"/>
+  <circle cx="566" cy="182" r="70" fill="#dd8a66" opacity="0.92"/>
+  <circle cx="250" cy="244" r="192" stroke="#a8472a" stroke-width="2" opacity="0.4"/>
+  <circle cx="664" cy="360" r="14" fill="#5c554d" opacity="0.7"/>
+</svg>
