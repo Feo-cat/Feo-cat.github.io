@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" fill="none" role="img" aria-label="GitHub Actions 封面：定时循环">
+  <rect width="800" height="480" fill="#f0ece3"/>
+  <path d="M400 100 A 140 140 0 1 1 260 240" stroke="#a8472a" stroke-width="11" stroke-linecap="round" opacity="0.5"/>
+  <path d="M260 240 l-22 -38 l44 6 z" fill="#a8472a" opacity="0.5"/>
+  <circle cx="400" cy="240" r="98" fill="#c15f3c" opacity="0.92"/>
+  <line x1="400" y1="240" x2="400" y2="178" stroke="#f0ece3" stroke-width="9" stroke-linecap="round"/>
+  <line x1="400" y1="240" x2="446" y2="262" stroke="#f0ece3" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="400" cy="240" r="10" fill="#f0ece3"/>
+  <circle cx="566" cy="356" r="30" fill="#dd8a66" opacity="0.9"/>
+  <circle cx="236" cy="360" r="12" fill="#5c554d" opacity="0.55"/>
+</svg>

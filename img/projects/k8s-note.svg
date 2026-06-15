@@ -1,10 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" fill="none" role="img" aria-label="Kubernetes 抽象封面">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" fill="none" role="img" aria-label="Kubernetes 封面：船舵">
   <rect width="800" height="480" fill="#f2ede4"/>
-  <path d="M250 160 L400 240 L550 160 M400 240 L400 362 M250 322 L400 240 L550 322" stroke="#a8472a" stroke-width="2" opacity="0.42"/>
-  <circle cx="400" cy="240" r="58" fill="#c15f3c" opacity="0.92"/>
-  <circle cx="250" cy="160" r="34" fill="#d4a27f"/>
-  <circle cx="550" cy="160" r="34" fill="#dd8a66"/>
-  <circle cx="250" cy="322" r="34" fill="#dd8a66"/>
-  <circle cx="550" cy="322" r="34" fill="#d4a27f"/>
-  <circle cx="400" cy="362" r="28" fill="#a8472a" opacity="0.82"/>
+  <circle cx="400" cy="240" r="128" fill="none" stroke="#c15f3c" stroke-width="11" opacity="0.92"/>
+  <g stroke="#c15f3c" stroke-width="9" stroke-linecap="round" opacity="0.92">
+    <line x1="400" y1="240" x2="400" y2="120"/>
+    <line x1="400" y1="240" x2="494" y2="165"/>
+    <line x1="400" y1="240" x2="517" y2="267"/>
+    <line x1="400" y1="240" x2="452" y2="348"/>
+    <line x1="400" y1="240" x2="348" y2="348"/>
+    <line x1="400" y1="240" x2="283" y2="267"/>
+    <line x1="400" y1="240" x2="306" y2="165"/>
+  </g>
+  <g fill="#dd8a66">
+    <circle cx="400" cy="120" r="13"/><circle cx="494" cy="165" r="13"/><circle cx="517" cy="267" r="13"/>
+    <circle cx="452" cy="348" r="13"/><circle cx="348" cy="348" r="13"/><circle cx="283" cy="267" r="13"/><circle cx="306" cy="165" r="13"/>
+  </g>
+  <circle cx="400" cy="240" r="30" fill="#a8472a"/>
 </svg>
