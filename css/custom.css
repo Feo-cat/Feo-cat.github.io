@@ -884,3 +884,117 @@ a:visited {
     height: 178px;
   }
 }
+
+/* ============================================================
+   Anthropic v2（2026-06-15）：去卡片化 + 抽象插画。
+   更扁平、更开阔，靠留白与细线分隔，而非边框卡片。
+   回滚：删除本分隔线以下全部内容即可；完整原版见仓库根 custom.css.bak。
+   ============================================================ */
+
+/* 拆掉卡片外壳：边框 / 底色 / 阴影 / 圆角 */
+#post,
+#page,
+#aside-content .card-widget,
+.feature-card,
+.wiki-grid article,
+.lab-board article,
+.about-grid article,
+.project-mini {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* 文章列表：细线分隔的清单，而非一摞卡片 */
+#recent-posts .recent-post-item {
+  margin-bottom: 0;
+  border: 0;
+  border-bottom: 1px solid var(--paper-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#recent-posts .recent-post-item:last-child {
+  border-bottom: 0;
+}
+#recent-posts .recent-post-item:hover {
+  border-color: var(--paper-line);
+  box-shadow: none;
+  transform: none;
+}
+#recent-posts .recent-post-item .post_cover {
+  border-bottom: 0;
+}
+#recent-posts .recent-post-item .post-bg {
+  filter: none;
+}
+
+/* 首页特征块：顶部细线代替卡片框 */
+.feature-card,
+.wiki-grid article,
+.lab-board article,
+.about-grid article {
+  padding: 26px 0 4px;
+  border-top: 1px solid var(--paper-line);
+}
+.feature-large {
+  grid-row: auto;
+  min-height: 0;
+}
+
+/* 项目缩略：去框，图片保留圆角 */
+.project-mini img {
+  border: 0;
+  border-radius: 9px;
+}
+.project-mini span {
+  padding: 14px 2px 0;
+}
+
+/* 侧栏：安静旁注，无卡片底 */
+#aside-content .card-widget {
+  padding: 4px 0 10px;
+  backdrop-filter: none;
+}
+
+/* ---- 抽象插画：首页 hero 右侧伴随图 ---- */
+.home-hero {
+  position: relative;
+}
+@media screen and (min-width: 769px) {
+  .home-hero {
+    padding-right: clamp(180px, 26vw, 360px);
+  }
+  .home-hero::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: clamp(150px, 22vw, 300px);
+    aspect-ratio: 1;
+    transform: translateY(-50%);
+    background: url("/img/abstract-hero.svg") center / contain no-repeat;
+    pointer-events: none;
+  }
+}
+
+/* ---- 抽象插画：文章/页面页眉的淡角标 ---- */
+#page-header.not-home-page::after,
+#page-header.post-bg::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: -12px;
+  width: clamp(150px, 20vw, 280px);
+  aspect-ratio: 1;
+  background: url("/img/abstract-hero.svg") center / contain no-repeat;
+  opacity: 0.2;
+  pointer-events: none;
+}
+@media screen and (max-width: 768px) {
+  #page-header.not-home-page::after,
+  #page-header.post-bg::after {
+    display: none;
+  }
+}
