@@ -1,0 +1,188 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环 | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="这是写作助手系列的核心篇：为什么、怎么做、代价是什么，一次讲完。有个套娃的事实先交代：这篇的初稿素材，是我用自己的写作助手的「making-of 模式」对我自己做的一场访谈问出来的——而这个模式本身，就诞生于写这篇时的一次翻车（见第四节）。代码在 daily-copilot。   研究员变手搓：为什么我把 server-side 搜索干掉了先说清研究员是谁：写作助手里负责联网查资料的那个 age">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环">
+<meta property="og:url" content="http://example.com/2026/07/19/client-side-react-loop/index.html">
+<meta property="og:site_name" content="Feo">
+<meta property="og:description" content="这是写作助手系列的核心篇：为什么、怎么做、代价是什么，一次讲完。有个套娃的事实先交代：这篇的初稿素材，是我用自己的写作助手的「making-of 模式」对我自己做的一场访谈问出来的——而这个模式本身，就诞生于写这篇时的一次翻车（见第四节）。代码在 daily-copilot。   研究员变手搓：为什么我把 server-side 搜索干掉了先说清研究员是谁：写作助手里负责联网查资料的那个 age">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/projects/agent-notebook.svg">
+<meta property="article:published_time" content="2026-07-19T14:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-19T14:30:00.000Z">
+<meta property="article:author" content="Feo">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="ReAct">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/projects/agent-notebook.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环",
+  "url": "http://example.com/2026/07/19/client-side-react-loop/",
+  "image": "http://example.com/img/projects/agent-notebook.svg",
+  "datePublished": "2026-07-19T14:30:00.000Z",
+  "dateModified": "2026-07-19T14:30:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Feo",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2026/07/19/client-side-react-loop/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A241F')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F4EFE7')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css?v=20260615-anthropic-v3"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/projects/agent-notebook.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a><a class="nav-page-title" href="/"><span class="site-name">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-07-19T14:30:00.000Z" title="发表于 2026-07-19 22:30:00">2026-07-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-07-19T14:30:00.000Z" title="更新于 2026-07-19 22:30:00">2026-07-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/">技术笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>这是写作助手系列的核心篇：为什么、怎么做、代价是什么，一次讲完。有个套娃的事实先交代：这篇的初稿素材，是我用自己的写作助手的「making-of 模式」对我自己做的一场访谈问出来的——而这个模式本身，就诞生于写这篇时的一次翻车（见第四节）。代码在 <a target="_blank" rel="noopener" href="https://github.com/Feo-cat/daily-copilot">daily-copilot</a>。</p>
+</blockquote>
+<hr>
+<h2 id="研究员变手搓：为什么我把-server-side-搜索干掉了"><a href="#研究员变手搓：为什么我把-server-side-搜索干掉了" class="headerlink" title="研究员变手搓：为什么我把 server-side 搜索干掉了"></a>研究员变手搓：为什么我把 server-side 搜索干掉了</h2><p>先说清研究员是谁：写作助手里负责联网查资料的那个 agent。它原来的实现很省心——代码里只声明一行 Anthropic 的服务端 <code>web_search</code> 工具，搜索和循环全在人家服务器里代跑，我这边一行循环都没有。</p>
+<p>当时想着 Anthropic 的 API key 充值流程相对麻烦，本来就有换到其他模型的打算。而且我很清楚：服务端 web_search 是 Anthropic 专属的，必须用它家的 API 才能调，换模型就一定会丢掉这个工具。所以做切换之前，就同步决定把它换成手动实现的版本——顺手把整套 LLM 调用迁成了 OpenAI 兼容、配置驱动，<code>base_url</code>&#x2F;<code>key</code>&#x2F;<code>model</code> 全从环境变量读，之后换 provider 不用改代码。</p>
+<p>其实这件事在项目刚开始的时候我就想过了：最早就想自己手搓一个 client-side 的可降级检索作为熔断兜底。当初没一上来就做，主要是想先把基础链路跑通，让整个流程能端到端地走起来。所以 401 那把火与其说是逼我改，不如说是把 backlog 里排着队的事提前推上了台。</p>
+<h2 id="三件套-一个-while：client-side-ReAct-怎么做出来的"><a href="#三件套-一个-while：client-side-ReAct-怎么做出来的" class="headerlink" title="三件套 + 一个 while：client-side ReAct 怎么做出来的"></a>三件套 + 一个 while：client-side ReAct 怎么做出来的</h2><p>拆开看就三件套，加一个自己写的 while。</p>
+<p>一是用 OpenAI function calling 声明一个 <code>web_search</code> 工具，参数就一个 <code>query</code>——模型只负责「说要搜什么」。二是搜索后端用 <code>ddgs</code>（DuckDuckGo），免费、免 key。三是循环本体：模型回 <code>tool_calls</code>，我的代码解析出 query、去调 ddgs、把结果作为 <code>role=tool</code> 塞回 messages，再请求一次——直到模型不再要搜、交出素材简报。手感不是凭空来的：之前练手写过纯文本版的手搓 ReAct 和原生 tool-use 两个实验脚本（《不用框架，从零手搓一个 ReAct Agent》），这回是把那套肌肉记忆用在真工具上。</p>
+<p>ddgs 的选型过程，老实说：没有选型。当时是和 AI 结对，它先写了 ddgs 版，我 review 时认下的——决定性因素就一条，免费免 key。刚被 key 失效坑到停摆的人，对「再添一个凭据依赖」有生理性排斥。这个零成本选择后来暴露的账也都记着：串行搜索慢；偶发限流，所以搜索函数把异常整个兜住、失败时返回一句「搜索失败，换个查询词」的文本让模型自己重试；还有个小彩蛋——这个包 2024 年从 <code>duckduckgo_search</code> 改名 <code>ddgs</code>，我代码里至今留着两个名字都兜住的 import，算白嫖生态的隐性成本。</p>
+<p>循环配了双保险：轮数熔断（默认 4 轮）+ 熔断后强制收尾。这里有个设计点值得说清：熔断后光「不再理会搜索请求」是不够的，要<strong>把工具定义从请求里整个拿掉</strong>，模型才会死心、用手头信息就地成稿。这不是实验发现，是写循环时的结构性推理——给它什么选项，它就在什么选项里打转；想让它停，就把选项收走。首跑那次它 4 轮全在要搜、第 5 次调用收走工具加一句明示才交稿，算是验证了「收走」有效；但「只忽略、工具还在」的对照版我从没跑过，这句照实说。有意思的是「错误消息」这个手法我在另一个场景真用了——搜索失败时回错误文本，那是想让它<strong>继续</strong>用工具时的做法。对照起来一句话：想让它重试，给错误文本；想让它死心，收走工具。两种机制，服务两种意图。</p>
+<h2 id="首跑账单-168s：为什么贵的是时间，不是-token"><a href="#首跑账单-168s：为什么贵的是时间，不是-token" class="headerlink" title="首跑账单 168s：为什么贵的是时间，不是 token"></a>首跑账单 168s：为什么贵的是时间，不是 token</h2><p>我最直接的观察来自终端那十几行字。运行时屏幕上一行接一行蹦出「🔎 研究员搜索：…」，我眼睁睁看着它一条条往外跳，总共 12 行，等了将近三分钟才停下来。当时的感受很直观：模型完全没打算收手，一轮接一轮地搜，直到第 4 轮结束还没有停止的迹象。实际的轮次结构我是事后倒推才理清楚的——计数器显示一共 5 次 LLM 调用，而我设的上限是 4 轮，说明第 5 次调用就是熔断触发后强制收尾的那一刀。再把 12 次搜索摊进 4 轮，一除就算出来了：平均每轮 3 个搜索 query。</p>
+<p>说实话，我根本没预料到第一跑就会撞上熔断。熔断对我来说是防御性设计，骨子里的思路来自《实习里学的状态机和工厂》里反复强调的「兜底终态」——你得给系统一个必然会停下来的保险。我把它放进去，更多是出于设计上的谨慎，觉得「万一失控了总得有人拉闸」。没想到这种谨慎在第一次真实 run 里就变成了真实数据，这也正是后来《研究员第一次真跑，就把熔断撞响了》那篇标题的来源：熔断不是装饰，第一次跑就直接用上了。</p>
+<p>至于 12 次串行搜索到底各花了多少秒、为什么它们会成为绝对大头，我得老老实实承认：这次测量里分项计时没做，这是个已知的窟窿。我现在只能告诉你，那将近三分钟的等待里，token 费用折算下来也就几分钱——真正让人心疼的是时间。「大头是串行搜索」是我当时在现场冒出来的判断，在把搜索耗时单独拆出来之前，它只能算推断，不能算严格结论。分项计时已经排进优化 backlog。</p>
+<h2 id="文本歧义翻车：研究员把我说的-client-side-搜成了浏览器端"><a href="#文本歧义翻车：研究员把我说的-client-side-搜成了浏览器端" class="headerlink" title="文本歧义翻车：研究员把我说的 client-side 搜成了浏览器端"></a>文本歧义翻车：研究员把我说的 client-side 搜成了浏览器端</h2><p>7 月 14 日我照常跑了写作助手，研究员上网搜完，策划输出了一份提纲。我把它贴进和 AI 结对的会话里，review 到一半就直接喊停了——那份提纲围着的全是 WebLLM、WebGPU、transformers.js，这些词我一个都没用过，完全答不上来。</p>
+<p>当时我给的只有一句选题串，研究员手上没有任何项目上下文。它上网去搜「client-side」，公网上这个词的主流含义就是浏览器端，于是它按这个含义自信地查了一堆前端 Web 推理的东西回来。这是一次典型的文本歧义翻车，但对我而言它只是个警报：它把纯网搜的脆弱性清清楚楚摆在了面前——研究员没有项目上下文，就必然按通用含义理解术语，哪怕这个词在我代码里的意思完全不同。</p>
+<p>不过，让我最终断定必须跳过研究员、直接喂手写素材的，不是歧义，而是另一层东西：<strong>类别错误</strong>。我要写的 making-of 素材，全在我自己的脑子和本地代码里，网上根本没有。就算研究员完美消歧，它搜回来的也只能是相关技术的通用介绍，而不是我实际踩坑、调试和做设计选择的过程。歧义还能用改措辞、喂 README 这类补丁去缓解，类别错误是补丁救不了的——这才是我给写作助手加「making-of 模式」的根据：跳过研究员、直接喂手写素材，再把策划和导师的提示词从「教学生」翻成「访谈亲历者」。顺带，那份手写素材的第一节至今就叫「名词校准（防歧义，这次翻车的根源）」——疤痕直接长在了素材的开头。</p>
+<h2 id="只有「下一步依赖上一步反馈」才值得上循环"><a href="#只有「下一步依赖上一步反馈」才值得上循环" class="headerlink" title="只有「下一步依赖上一步反馈」才值得上循环"></a>只有「下一步依赖上一步反馈」才值得上循环</h2><p>这个分界线还真不是我坐在那儿一步步推演出来的，更像是系统自己「长」成这样的。判断标准就一条，我在《Workflow 还是 Agent》里也写过：下一步是不是依赖上一步的反馈。研究员明显满足——它下一个搜索词完全取决于上一轮搜回来的内容，步数提前没法确定，所以必须上循环，还得配熔断。策划、编辑、终审就不一样了：它们的输入都是一次性给齐的——策划拿选题加素材，编辑拿完整的问答记录，终审拿整篇草稿——中间不会突然冒出新信息。遇到失败也就是「产出不好」，整个调用重跑一次就是全部的纠错手段，这时候上循环买不到实际好处。终审的代码里我还特意留了注释：哪天做成「作者回应→再审一轮」，反馈依赖一出现，再把它升级成循环。</p>
+<p>还有一个容易被漏掉的角色——导师其实也是循环。下一轮追问完全取决于我上一答，只不过反馈源从工具结果换成了人，所以它被做成了「判定掌握 + 轮数熔断」的双出口状态机。</p>
+<p>你要问有没有试过把某些角色强行循环化然后发现不对劲？代码上没这么折腾过，但写作上有一次非常真实的打脸：这篇博客最早定的选题就叫「我把每个 agent 都手搓成了 ReAct 循环」，后来被现实完全证伪，只好把选题废掉——真实跑出来的系统里，只有研究员被 401 逼成了循环，其余都保持单次调用。我本来想交一篇全 ReAct 化的战报，最后写成的却是「为什么我没有全 ReAct 化」。是系统本身的反馈告诉我哪里需要循环，不是我挨个试出来的。</p>
+<p>至于 server-tool 和 client-tool 的取舍，我不觉得跟「要不要循环」是同一套判断，它们是两刀。第一刀决定这里要不要循环，看有没有反馈依赖；第二刀决定已经存在的循环放在谁家，看的是控制权——研究员的循环在 Anthropic 时代也存在，只不过跑在人家机房里。要不要搬回家，得看它是不是你需要掌控的核心资产、需不需要扛过换 provider 的风险。两刀背后是同一条原则：<strong>复杂度只花在有回报的地方</strong>。循环的价格我首跑就付过了：workflow 的成本在写代码阶段就基本定死，循环的成本是个分布、长尾很长，还得配熔断——在根本没有反馈依赖的地方硬上循环，等于白买一份不可预知。</p>
+<h2 id="收尾"><a href="#收尾" class="headerlink" title="收尾"></a>收尾</h2><p>一把失效的 key，逼我把一个「想做很久」的东西从 backlog 里拽了出来；一次歧义翻车，又逼着这套工具长出了第二种形态。回头看，这条 client-side 循环买到的三样东西——provider 无关、循环在自己手里、熔断规则自己定——每一样都是在某次翻车里被验证值钱的。</p>
+<p>访谈初稿的过程里，我的访谈员还两次揪出了我素材里写过头的句子（一处把设计推理写成了「实验发现」，一处把估算写成了实测）——用自己的工具审自己的叙事，这个故事值得单独写一篇，先记账。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Feo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2026/07/19/client-side-react-loop/">http://example.com/2026/07/19/client-side-react-loop/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Feo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/Agent/">Agent</a><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/ReAct/">ReAct</a></div><div class="post-share"><div class="social-share" data-image="/img/projects/agent-notebook.svg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手"><img class="cover" src="/img/projects/agent-notebook.svg" onerror="onerror=null;src='/img/projects/default-cover.svg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">事实核查员的第一场考试，和裸模型打了个平手</div></div><div class="info-2"><div class="info-item-1"> 周末的短文，也是一次认账：这篇本该属于上周——写作助手连环翻车吃掉了仅有的两个晚上，断更红线第一次破了。补上，认账，继续（翻车与加固的完整故事，值得之后另写一篇）。本文记上周日夜里的一场考试：我给写作助手加的事实核查员，第一次 eval 和裸模型打平，以及后来那个把 80% 变成 100% 的回落层。代码在 daily-copilot。   管线长什...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-10</div><div class="info-item-2">研究员第一次真跑，就把熔断撞响了</div></div><div class="info-2"><div class="info-item-1"> 工作日晚的短文。这周我把写作助手的研究员从「服务端 web_search」换成了手写的 client-side 检索循环（起因是一把失效的 API key，完整改造记之后另写）。本文只记它第一次真跑的 168.8 秒，和一条被撞响的熔断。代码在 daily-copilot。   一组数字选题是很小的一个：「什么是 prompt caching」。研究...</div></div></div></a><a class="pagination-related" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-19</div><div class="info-item-2">事实核查员的第一场考试，和裸模型打了个平手</div></div><div class="info-2"><div class="info-item-1"> 周末的短文，也是一次认账：这篇本该属于上周——写作助手连环翻车吃掉了仅有的两个晚上，断更红线第一次破了。补上，认账，继续（翻车与加固的完整故事，值得之后另写一篇）。本文记上周日夜里的一场考试：我给写作助手加的事实核查员，第一次 eval 和裸模型打平，以及后来那个把 80% 变成 100% 的回落层。代码在 daily-copilot。   管线长什...</div></div></div></a><a class="pagination-related" href="/2026/06/17/react-from-scratch/" title="不用框架，从零手搓一个 ReAct Agent"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-17</div><div class="info-item-2">不用框架，从零手搓一个 ReAct Agent</div></div><div class="info-2"><div class="info-item-1"> 代码在我的 daily-copilot 项目里：experiments/react_warmup.py（约 180 行，无任何 agent 框架、不用 SDK 原生 tool-use）。   0. 引子：ReAct 是什么我给自己出了道小题：让一个大模型回答「距离项目收尾（2026-08-21）还剩几周零几天？」。 听着简单——直接问它不就完了？可你...</div></div></div></a><a class="pagination-related" href="/2026/06/19/workflow-vs-agent/" title="Workflow 还是 Agent：什么时候该让模型自己决定"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-19</div><div class="info-item-2">Workflow 还是 Agent：什么时候该让模型自己决定</div></div><div class="info-2"><div class="info-item-1"> 这篇是我边搭 daily-copilot 的 multi-agent 写作助手、边想清楚的一个问题：到底什么时候该让模型自己决定流程。文中的例子大多来自这个项目本身。   我以为 Agent 就是更厉害的 Workflow，直到看见这张自主性图谱Workflow 和 Agent 最根本的区别，在于谁来决定流程。Workflow 的编排来自我当初写代码...</div></div></div></a><a class="pagination-related" href="/2026/07/03/backend-patterns-in-agents/" title="实习里学的状态机和工厂，在我的 agent 代码里复活了"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-03</div><div class="info-item-2">实习里学的状态机和工厂，在我的 agent 代码里复活了</div></div><div class="info-2"><div class="info-item-1"> 这是一篇工作日晚的短文。白天在公司实习写 Go 后端，晚上回来搓 daily-copilot 的 multi-agent 写作助手，两边代码看多了，我在 agent 这边认出了两个实习里的老朋友。涉及实习的部分已脱敏，只留下模式本身。   我以为这些模式会留在公司代码库里做 agent 项目之前，我隐约觉得业务后端那套——状态流转、注册分发——和「让...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Feo</div><div class="author-info-description">Feo。代码、AI、视觉与安静记录。</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Feo-cat"><i class="fab fa-github"></i><span>GitHub</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 Feo 的个人笔记。内容还不多，但会慢慢认真长出来。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A0%94%E7%A9%B6%E5%91%98%E5%8F%98%E6%89%8B%E6%90%93%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E6%8A%8A-server-side-%E6%90%9C%E7%B4%A2%E5%B9%B2%E6%8E%89%E4%BA%86"><span class="toc-number">1.</span> <span class="toc-text">研究员变手搓：为什么我把 server-side 搜索干掉了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E4%BB%B6%E5%A5%97-%E4%B8%80%E4%B8%AA-while%EF%BC%9Aclient-side-ReAct-%E6%80%8E%E4%B9%88%E5%81%9A%E5%87%BA%E6%9D%A5%E7%9A%84"><span class="toc-number">2.</span> <span class="toc-text">三件套 + 一个 while：client-side ReAct 怎么做出来的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A6%96%E8%B7%91%E8%B4%A6%E5%8D%95-168s%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%B4%B5%E7%9A%84%E6%98%AF%E6%97%B6%E9%97%B4%EF%BC%8C%E4%B8%8D%E6%98%AF-token"><span class="toc-number">3.</span> <span class="toc-text">首跑账单 168s：为什么贵的是时间，不是 token</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E6%9C%AC%E6%AD%A7%E4%B9%89%E7%BF%BB%E8%BD%A6%EF%BC%9A%E7%A0%94%E7%A9%B6%E5%91%98%E6%8A%8A%E6%88%91%E8%AF%B4%E7%9A%84-client-side-%E6%90%9C%E6%88%90%E4%BA%86%E6%B5%8F%E8%A7%88%E5%99%A8%E7%AB%AF"><span class="toc-number">4.</span> <span class="toc-text">文本歧义翻车：研究员把我说的 client-side 搜成了浏览器端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AA%E6%9C%89%E3%80%8C%E4%B8%8B%E4%B8%80%E6%AD%A5%E4%BE%9D%E8%B5%96%E4%B8%8A%E4%B8%80%E6%AD%A5%E5%8F%8D%E9%A6%88%E3%80%8D%E6%89%8D%E5%80%BC%E5%BE%97%E4%B8%8A%E5%BE%AA%E7%8E%AF"><span class="toc-number">5.</span> <span class="toc-text">只有「下一步依赖上一步反馈」才值得上循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B6%E5%B0%BE"><span class="toc-number">6.</span> <span class="toc-text">收尾</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"/></a><div class="content"><a class="title" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</a><time datetime="2026-07-19T14:30:00.000Z" title="发表于 2026-07-19 22:30:00">2026-07-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="事实核查员的第一场考试，和裸模型打了个平手"/></a><div class="content"><a class="title" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手">事实核查员的第一场考试，和裸模型打了个平手</a><time datetime="2026-07-19T13:00:00.000Z" title="发表于 2026-07-19 21:00:00">2026-07-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="研究员第一次真跑，就把熔断撞响了"/></a><div class="content"><a class="title" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了">研究员第一次真跑，就把熔断撞响了</a><time datetime="2026-07-10T15:30:00.000Z" title="发表于 2026-07-10 23:30:00">2026-07-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/03/backend-patterns-in-agents/" title="实习里学的状态机和工厂，在我的 agent 代码里复活了"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="实习里学的状态机和工厂，在我的 agent 代码里复活了"/></a><div class="content"><a class="title" href="/2026/07/03/backend-patterns-in-agents/" title="实习里学的状态机和工厂，在我的 agent 代码里复活了">实习里学的状态机和工厂，在我的 agent 代码里复活了</a><time datetime="2026-07-03T15:40:00.000Z" title="发表于 2026-07-03 23:40:00">2026-07-03</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>事实核查员的第一场考试，和裸模型打了个平手 | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="周末的短文，也是一次认账：这篇本该属于上周——写作助手连环翻车吃掉了仅有的两个晚上，断更红线第一次破了。补上，认账，继续（翻车与加固的完整故事，值得之后另写一篇）。本文记上周日夜里的一场考试：我给写作助手加的事实核查员，第一次 eval 和裸模型打平，以及后来那个把 80% 变成 100% 的回落层。代码在 daily-copilot。   管线长什么样给写作助手加的第二双眼睛，是个 CRAG">
+<meta property="og:type" content="article">
+<meta property="og:title" content="事实核查员的第一场考试，和裸模型打了个平手">
+<meta property="og:url" content="http://example.com/2026/07/19/crag-first-exam/index.html">
+<meta property="og:site_name" content="Feo">
+<meta property="og:description" content="周末的短文，也是一次认账：这篇本该属于上周——写作助手连环翻车吃掉了仅有的两个晚上，断更红线第一次破了。补上，认账，继续（翻车与加固的完整故事，值得之后另写一篇）。本文记上周日夜里的一场考试：我给写作助手加的事实核查员，第一次 eval 和裸模型打平，以及后来那个把 80% 变成 100% 的回落层。代码在 daily-copilot。   管线长什么样给写作助手加的第二双眼睛，是个 CRAG">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/projects/agent-notebook.svg">
+<meta property="article:published_time" content="2026-07-19T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-19T13:00:00.000Z">
+<meta property="article:author" content="Feo">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="RAG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/projects/agent-notebook.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "事实核查员的第一场考试，和裸模型打了个平手",
+  "url": "http://example.com/2026/07/19/crag-first-exam/",
+  "image": "http://example.com/img/projects/agent-notebook.svg",
+  "datePublished": "2026-07-19T13:00:00.000Z",
+  "dateModified": "2026-07-19T13:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Feo",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2026/07/19/crag-first-exam/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A241F')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F4EFE7')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '事实核查员的第一场考试，和裸模型打了个平手',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css?v=20260615-anthropic-v3"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/projects/agent-notebook.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a><a class="nav-page-title" href="/"><span class="site-name">事实核查员的第一场考试，和裸模型打了个平手</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">事实核查员的第一场考试，和裸模型打了个平手</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-07-19T13:00:00.000Z" title="发表于 2026-07-19 21:00:00">2026-07-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-07-19T13:00:00.000Z" title="更新于 2026-07-19 21:00:00">2026-07-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%AC%94%E8%AE%B0/">技术笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p>周末的短文，也是一次认账：这篇本该属于上周——写作助手连环翻车吃掉了仅有的两个晚上，断更红线第一次破了。补上，认账，继续（翻车与加固的完整故事，值得之后另写一篇）。本文记上周日夜里的一场考试：我给写作助手加的事实核查员，第一次 eval 和裸模型打平，以及后来那个把 80% 变成 100% 的回落层。代码在 <a target="_blank" rel="noopener" href="https://github.com/Feo-cat/daily-copilot">daily-copilot</a>。</p>
+</blockquote>
+<hr>
+<h2 id="管线长什么样"><a href="#管线长什么样" class="headerlink" title="管线长什么样"></a>管线长什么样</h2><p>给写作助手加的第二双眼睛，是个 CRAG 简化版核查器：把草稿拆成一条条可核查的陈述，先对照素材给每条打置信度；高置信直接放行，低置信才走「query 改写 → 免费搜索（ddgs）→ 依据证据裁决」。multi-hop 一开始就砍掉了——简化是既定路线，不是没做完。</p>
+<p>打分标准是我自己定的三条，也是这个核查器的灵魂：<strong>分层信任</strong>——素材里有直接依据的 0.8 起步，素材没提但属稳固技术常识的落在 0.5~0.8，两头都不沾的 0.5 以下；<strong>数字铁律</strong>——陈述里含数字&#x2F;版本号&#x2F;日期而素材里没有同款数字的，置信度一律封顶 0.5，数字是幻觉重灾区，必须送检；<strong>reason 只给人看</strong>——打分理由用来 debug，不喂下游，管线不为解释买单。</p>
+<h2 id="第一场考试：80-对-80"><a href="#第一场考试：80-对-80" class="headerlink" title="第一场考试：80% 对 80%"></a>第一场考试：80% 对 80%</h2><p>考卷 10 道题，三类混排：事实正确的、事实有错的、本就查证不到的。对手是 V1——同一个模型，直接裸判真伪，没素材、没检索、没管线。</p>
+<p>结果：<strong>V1 8&#x2F;10，V2 8&#x2F;10</strong>。加了打分、加了检索、加了裁决纪律，分没涨。</p>
+<h2 id="拆平局：每一环都对，串起来却错了"><a href="#拆平局：每一环都对，串起来却错了" class="headerlink" title="拆平局：每一环都对，串起来却错了"></a>拆平局：每一环都对，串起来却错了</h2><p>平局不等于白干。拆开看，V2 修好了 V1 答错的两条：ddgs 免 key 这种小众库知识，deepseek-chat 旧别名将停用这种新近变化——<strong>知识缺口型的错误，检索确实是解药</strong>。</p>
+<p>但它同时弄丢了两条 V1 本来就会的。最典型的是「Python 3.13 已默认移除 GIL」：数字铁律看到 3.13，强制送检 → 搜回来的摘要片段讲不清 free-threaded 到底是不是默认构建，证据很薄 → 裁决纪律又刻意保守（证据没提到 ≠ 陈述为假）→ 最终吐了个 unverifiable。而裸判的 V1 张口就答对了：那是可选构建，不是默认。</p>
+<p>三个设计单看每一个都对：数字该送检，薄证据不该硬下结论，「没搜到」不该当「是假的」。<strong>串起来，却把模型自己明明有的知识关在了门外。</strong>管线的错常常不在某一环，而在环与环的接缝里。</p>
+<h2 id="V2-1：一个回落层定胜负"><a href="#V2-1：一个回落层定胜负" class="headerlink" title="V2.1：一个回落层定胜负"></a>V2.1：一个回落层定胜负</h2><p>补丁小得不好意思：证据能定论，听证据；<strong>证据定不了论，退回去听模型裸判</strong>；裸判也说不准，才是真 unverifiable。evidence 字段全程留痕（「证据不足 → 裸判回落」），每条裁决的来路可查。</p>
+<p>改完复跑：<strong>10&#x2F;10</strong>。</p>
+<p>Corrective RAG 的 corrective，我原来读成「用检索纠正模型」。这一晚之后我的理解多了半句：<strong>检索是来给模型的知识缺口打补丁的，不是来没收模型已有知识的。</strong>裁决权要排序——先信模型该信的，查模型该查的，查不出来，就退回去信模型。</p>
+<h2 id="诚实账单"><a href="#诚实账单" class="headerlink" title="诚实账单"></a>诚实账单</h2><p>这组数字别过度解读：n&#x3D;10，+20 个百分点是在这套自制考卷上打出来的，扩样本重验之前它是个强信号，不是定论。代价也真实：V1 全卷 34 秒，V2.1 要 190 秒——低置信的题要走改写、搜索、裁决，必要时再补一刀裸判。遗留的债也记着：query 改写几乎在照抄原句（中立化没做好）、0.7 的阈值一次没扫过、reason 还没进管线当检索线索。和上次一样，这组原始数字故意不动——它是之后所有调参的 baseline。</p>
+<h2 id="收尾"><a href="#收尾" class="headerlink" title="收尾"></a>收尾</h2><p>检索那一侧的熔断故事，在《研究员第一次真跑，就把熔断撞响了》；这条核查管线本身是个每步单次调用的 workflow，为什么不上循环，答案还是《Workflow 还是 Agent》那篇的老话——这里没有「下一步依赖上一步反馈」。</p>
+<p>这一晚真正学到的是裁决权的排序。给系统加的工具越多，越要想清楚<strong>听谁的、什么时候听</strong>——检索增强不是「凡事都查」，更不是「查了就得听」。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Feo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2026/07/19/crag-first-exam/">http://example.com/2026/07/19/crag-first-exam/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Feo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/Agent/">Agent</a><a class="post-meta__tags" href="/tags/LLM/">LLM</a><a class="post-meta__tags" href="/tags/RAG/">RAG</a></div><div class="post-share"><div class="social-share" data-image="/img/projects/agent-notebook.svg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"><img class="cover" src="/img/projects/agent-notebook.svg" onerror="onerror=null;src='/img/projects/default-cover.svg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</div></div><div class="info-2"><div class="info-item-1"> 这是写作助手系列的核心篇：为什么、怎么做、代价是什么，一次讲完。有个套娃的事实先交代：这篇的初稿素材，是我用自己的写作助手的「making-of 模式」对我自己做的一场访谈问出来的——而这个模式本身，就诞生于写这篇时的一次翻车（见第四节）。代码在 daily-copilot。   研究员变手搓：为什么我把 server-side 搜索干掉了先说清研究...</div></div></div></a><a class="pagination-related" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了"><img class="cover" src="/img/projects/agent-notebook.svg" onerror="onerror=null;src='/img/projects/default-cover.svg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">研究员第一次真跑，就把熔断撞响了</div></div><div class="info-2"><div class="info-item-1"> 工作日晚的短文。这周我把写作助手的研究员从「服务端 web_search」换成了手写的 client-side 检索循环（起因是一把失效的 API key，完整改造记之后另写）。本文只记它第一次真跑的 168.8 秒，和一条被撞响的熔断。代码在 daily-copilot。   一组数字选题是很小的一个：「什么是 prompt caching」。研究...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/06/19/workflow-vs-agent/" title="Workflow 还是 Agent：什么时候该让模型自己决定"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-19</div><div class="info-item-2">Workflow 还是 Agent：什么时候该让模型自己决定</div></div><div class="info-2"><div class="info-item-1"> 这篇是我边搭 daily-copilot 的 multi-agent 写作助手、边想清楚的一个问题：到底什么时候该让模型自己决定流程。文中的例子大多来自这个项目本身。   我以为 Agent 就是更厉害的 Workflow，直到看见这张自主性图谱Workflow 和 Agent 最根本的区别，在于谁来决定流程。Workflow 的编排来自我当初写代码...</div></div></div></a><a class="pagination-related" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-10</div><div class="info-item-2">研究员第一次真跑，就把熔断撞响了</div></div><div class="info-2"><div class="info-item-1"> 工作日晚的短文。这周我把写作助手的研究员从「服务端 web_search」换成了手写的 client-side 检索循环（起因是一把失效的 API key，完整改造记之后另写）。本文只记它第一次真跑的 168.8 秒，和一条被撞响的熔断。代码在 daily-copilot。   一组数字选题是很小的一个：「什么是 prompt caching」。研究...</div></div></div></a><a class="pagination-related" href="/2026/06/17/react-from-scratch/" title="不用框架，从零手搓一个 ReAct Agent"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-17</div><div class="info-item-2">不用框架，从零手搓一个 ReAct Agent</div></div><div class="info-2"><div class="info-item-1"> 代码在我的 daily-copilot 项目里：experiments/react_warmup.py（约 180 行，无任何 agent 框架、不用 SDK 原生 tool-use）。   0. 引子：ReAct 是什么我给自己出了道小题：让一个大模型回答「距离项目收尾（2026-08-21）还剩几周零几天？」。 听着简单——直接问它不就完了？可你...</div></div></div></a><a class="pagination-related" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-19</div><div class="info-item-2">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</div></div><div class="info-2"><div class="info-item-1"> 这是写作助手系列的核心篇：为什么、怎么做、代价是什么，一次讲完。有个套娃的事实先交代：这篇的初稿素材，是我用自己的写作助手的「making-of 模式」对我自己做的一场访谈问出来的——而这个模式本身，就诞生于写这篇时的一次翻车（见第四节）。代码在 daily-copilot。   研究员变手搓：为什么我把 server-side 搜索干掉了先说清研究...</div></div></div></a><a class="pagination-related" href="/2026/07/03/backend-patterns-in-agents/" title="实习里学的状态机和工厂，在我的 agent 代码里复活了"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-03</div><div class="info-item-2">实习里学的状态机和工厂，在我的 agent 代码里复活了</div></div><div class="info-2"><div class="info-item-1"> 这是一篇工作日晚的短文。白天在公司实习写 Go 后端，晚上回来搓 daily-copilot 的 multi-agent 写作助手，两边代码看多了，我在 agent 这边认出了两个实习里的老朋友。涉及实习的部分已脱敏，只留下模式本身。   我以为这些模式会留在公司代码库里做 agent 项目之前，我隐约觉得业务后端那套——状态流转、注册分发——和「让...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Feo</div><div class="author-info-description">Feo。代码、AI、视觉与安静记录。</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Feo-cat"><i class="fab fa-github"></i><span>GitHub</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 Feo 的个人笔记。内容还不多，但会慢慢认真长出来。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%A1%E7%BA%BF%E9%95%BF%E4%BB%80%E4%B9%88%E6%A0%B7"><span class="toc-number">1.</span> <span class="toc-text">管线长什么样</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E5%9C%BA%E8%80%83%E8%AF%95%EF%BC%9A80-%E5%AF%B9-80"><span class="toc-number">2.</span> <span class="toc-text">第一场考试：80% 对 80%</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%86%E5%B9%B3%E5%B1%80%EF%BC%9A%E6%AF%8F%E4%B8%80%E7%8E%AF%E9%83%BD%E5%AF%B9%EF%BC%8C%E4%B8%B2%E8%B5%B7%E6%9D%A5%E5%8D%B4%E9%94%99%E4%BA%86"><span class="toc-number">3.</span> <span class="toc-text">拆平局：每一环都对，串起来却错了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#V2-1%EF%BC%9A%E4%B8%80%E4%B8%AA%E5%9B%9E%E8%90%BD%E5%B1%82%E5%AE%9A%E8%83%9C%E8%B4%9F"><span class="toc-number">4.</span> <span class="toc-text">V2.1：一个回落层定胜负</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%9A%E5%AE%9E%E8%B4%A6%E5%8D%95"><span class="toc-number">5.</span> <span class="toc-text">诚实账单</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B6%E5%B0%BE"><span class="toc-number">6.</span> <span class="toc-text">收尾</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"/></a><div class="content"><a class="title" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</a><time datetime="2026-07-19T14:30:00.000Z" title="发表于 2026-07-19 22:30:00">2026-07-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="事实核查员的第一场考试，和裸模型打了个平手"/></a><div class="content"><a class="title" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手">事实核查员的第一场考试，和裸模型打了个平手</a><time datetime="2026-07-19T13:00:00.000Z" title="发表于 2026-07-19 21:00:00">2026-07-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="研究员第一次真跑，就把熔断撞响了"/></a><div class="content"><a class="title" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了">研究员第一次真跑，就把熔断撞响了</a><time datetime="2026-07-10T15:30:00.000Z" title="发表于 2026-07-10 23:30:00">2026-07-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/03/backend-patterns-in-agents/" title="实习里学的状态机和工厂，在我的 agent 代码里复活了"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="实习里学的状态机和工厂，在我的 agent 代码里复活了"/></a><div class="content"><a class="title" href="/2026/07/03/backend-patterns-in-agents/" title="实习里学的状态机和工厂，在我的 agent 代码里复活了">实习里学的状态机和工厂，在我的 agent 代码里复活了</a><time datetime="2026-07-03T15:40:00.000Z" title="发表于 2026-07-03 23:40:00">2026-07-03</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
