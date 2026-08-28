@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里 | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="“没有特权核心可修补”到底是什么意思如果 Harness 把模型调用硬编码在核心里，只有工具是插件，那想替换整个模型调用的人就会卡在“核心代码不让换”这一步：模型调用不在插件边界上，想动它就得去改上游核心实现，甚至自己 fork 一份来维护。没有特权核心就是避免这个卡点——模型调用本身也做成插件，想换的时候不用碰核心源码，自己写一个对应的模型调用插件，把原来的插件替换掉就行。 Cordis 元框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里">
+<meta property="og:url" content="https://feo-cat.github.io/2026/08/26/everything-is-a-plugin/index.html">
+<meta property="og:site_name" content="Feo">
+<meta property="og:description" content="“没有特权核心可修补”到底是什么意思如果 Harness 把模型调用硬编码在核心里，只有工具是插件，那想替换整个模型调用的人就会卡在“核心代码不让换”这一步：模型调用不在插件边界上，想动它就得去改上游核心实现，甚至自己 fork 一份来维护。没有特权核心就是避免这个卡点——模型调用本身也做成插件，想换的时候不用碰核心源码，自己写一个对应的模型调用插件，把原来的插件替换掉就行。 Cordis 元框架">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://feo-cat.github.io/img/projects/agent-notebook.svg">
+<meta property="article:published_time" content="2026-08-26T05:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-26T05:30:00.000Z">
+<meta property="article:author" content="Feo">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="插件架构">
+<meta property="article:tag" content="DeepSeek">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://feo-cat.github.io/img/projects/agent-notebook.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里",
+  "url": "https://feo-cat.github.io/2026/08/26/everything-is-a-plugin/",
+  "image": "https://feo-cat.github.io/img/projects/agent-notebook.svg",
+  "datePublished": "2026-08-26T05:30:00.000Z",
+  "dateModified": "2026-08-26T05:30:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Feo",
+      "url": "https://feo-cat.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://feo-cat.github.io/2026/08/26/everything-is-a-plugin/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A241F')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F4EFE7')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css?v=20260615-anthropic-v3"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/projects/agent-notebook.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a><a class="nav-page-title" href="/"><span class="site-name">DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-08-26T05:30:00.000Z" title="发表于 2026-08-26 13:30:00">2026-08-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-08-26T05:30:00.000Z" title="更新于 2026-08-26 13:30:00">2026-08-26</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BE%E8%AE%A1%E6%8B%86%E8%A7%A3/">设计拆解</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="“没有特权核心可修补”到底是什么意思"><a href="#“没有特权核心可修补”到底是什么意思" class="headerlink" title="“没有特权核心可修补”到底是什么意思"></a>“没有特权核心可修补”到底是什么意思</h2><p>如果 Harness 把模型调用硬编码在核心里，只有工具是插件，那想替换整个模型调用的人就会卡在“核心代码不让换”这一步：模型调用不在插件边界上，想动它就得去改上游核心实现，甚至自己 fork 一份来维护。没有特权核心就是避免这个卡点——模型调用本身也做成插件，想换的时候不用碰核心源码，自己写一个对应的模型调用插件，把原来的插件替换掉就行。</p>
+<h2 id="Cordis-元框架：插件之间靠什么协作"><a href="#Cordis-元框架：插件之间靠什么协作" class="headerlink" title="Cordis 元框架：插件之间靠什么协作"></a>Cordis 元框架：插件之间靠什么协作</h2><p>我理解 Cordis 里插件之间不是靠 import 对方模块再直接调函数，而是靠 services 和 events 两类通道协作。services 解决“我需要一个能干什么的接口”，由运行时把提供方实例注入给使用方，使用方只依赖接口；events 解决“发生了一件事”，发布者发完就不管，订阅者之间互不感知。</p>
+<p>起初我以为，如果搜索插件完成后只把结果返回给调用方而不发布事件，新加审计插件可以挂在它后面，调用方拿到结果后就触发审计。后来发现不对：旁挂插件只是让代码有机会运行，不会自动插手别的插件内部的函数调用和返回值。要拿到“搜索完成”这个信号，搜索插件必须在动作发生时主动发布事件，审计插件订阅这个事件才能收到；否则订阅再多也没用。</p>
+<p>同理，如果 skill 插件想允许别人在执行前、执行后插入逻辑且不改代码，我起初觉得它应当主动提供接口供别人查询。实际上接口只能让别的插件主动来调用，无法在动作发生的瞬间自动触发。正确做法是发布事件，比如在 skill.execute 里通过 Cordis 上下文显式发布事件——<code>ctx.emit(&quot;before_execute&quot;, ctx)</code> 和 <code>ctx.emit(&quot;after_execute&quot;, ctx)</code>——把执行流程切出事件点；其他插件订阅这些事件来挂自己的逻辑。如果只发前后事件，执行中途没有事件点，想在“执行过程进行到一半”插入逻辑就做不到；要支持这种中途插入，被扩展方需要在中途发布一个 in_execute 事件，扩展插件通过订阅它来挂载。</p>
+<p>services 这边，我一开始觉得两个插件都声明提供 SearchService 时，应该把两个实现都注入给调用方去挑，否则可能选不到更合适的实现。但这样调用方又会依赖具体插件，回到直接耦合。Cordis 里 service 更像“一个契约 + 一个绑定”：使用方只依赖 SearchService 接口，具体用哪个实现由 profile&#x2F;装配阶段决定，运行时按装配结果注入；调用方不知道有几种实现存在。未绑定的提供者虽然声明了服务，但只是没有被激活；另一个插件也声明提供 SearchService 时，对使用方没有二义性，提供方之间才存在二义性，最终由开发者在 profile 里明确装配意图，避免同时激活多个。</p>
+<h2 id="把模型、工具、沙箱、Agent-Loop-全部降级为插件"><a href="#把模型、工具、沙箱、Agent-Loop-全部降级为插件" class="headerlink" title="把模型、工具、沙箱、Agent Loop 全部降级为插件"></a>把模型、工具、沙箱、Agent Loop 全部降级为插件</h2><p>Standard 和 Code 预设的差别应该发生在装配层，而不是在核心里写一堆 <code>if standard ... else if code ...</code> 来区分；如果那样做，就违背了前面说的无特权核心原则。插件不是散在源码里的模块，而是以 npm 包形式分发，每个插件包通过声明 <code>dsh.bundle</code> 告诉 Harness 自己是插件，然后被 patch 进某个 profile。替换模型、换沙箱、加新技能，就变成新增或替换一个包，并在 profile 里调整挂载顺序，而不是去 fork 仓库改源码。挂载点由 profile 调整，但插件要不要跟着核心升级改，不能只看自己的 <code>dsh.bundle</code> 声明；如果核心升级破坏了它依赖的 services&#x2F;events 接口，比如把 <code>LLMProvider</code> 的 <code>Complete</code> 改成 <code>Generate</code>，这个插件内部实现就编译不过，必须跟着改。反过来，如果破坏性变更只改了 profile 的装配语法，插件依赖的 services 和 events 接口本身没变，那插件就不需要改。等模型、工具、沙箱、Agent Loop 都降级成插件之后，固定不变的是那个微内核容器 cordis。所谓「可替换整个运行时」，换掉的是这些<strong>运行时能力插件</strong>——也就是激活的那一组——而不是 cordis 容器本身。换掉它们，agent 的行为逻辑完全变了，但 Harness 仍然只是在执行加载插件、卸载插件这些流程。</p>
+<h2 id="一个-npm-包就是一个插件：声明式装配规则"><a href="#一个-npm-包就是一个插件：声明式装配规则" class="headerlink" title="一个 npm 包就是一个插件：声明式装配规则"></a>一个 npm 包就是一个插件：声明式装配规则</h2><p>我理解下来，<code>dsh.bundle</code> 只是插件包里的一段自我声明，说明这个包想暴露哪些扩展能力；它本身不代表运行时一定会启用。要不要启用、按什么顺序启用，应该由 profile 的装配规则来负责，而不是把这部分决定权分给插件自己。这跟 Python 的 entry_points 有点像：包侧只是标了入口，真正加载时才会实例化。patch 也不是去改原代码，而是把插件挂到运行时的装配链上，比如给 HTTP 服务加鉴权中间件，原 handler 不用动，只把新中间件挂到合适的位置；Harness 的 patch 也是这个意思，原插件和核心都不需要改。</p>
+<p>所以社区要接入新的模型后端时，不一定需要 fork 仓库改核心。这里要分清两种情况：如果这个后端完全兼容 OpenAI 接口，那加一个自定义 provider 配置就行：填 <code>baseURL</code>、<code>api: openai-completions</code>、以及 <code>models</code> 下的模型 <code>id</code>。密钥那一项叫 <code>apiKeyEnv</code>，填的是<strong>环境变量名</strong>而不是 key 本身——配置文件里从头到尾不出现密钥；但如果协议不兼容，只是改配置没法让它工作，就需要写一个新的 model adapter 插件，在包里声明 <code>dsh.bundle</code>，实现 Harness 期望的模型接口，再把它 patch 进 profile。换句话说，新能力靠加插件，已有能力靠改配置，两者都不需要动核心。</p>
+<p>也有一些边界情况。比如后端完全兼容 OpenAI 接口，但需要带一个自定义请求头——而官方的 provider 配置文档里没有提到这一项。这种时候光改配置就接不上了，得写一个全新的模型适配器插件，把自定义请求头做成配置输入点暴露出来。这样同样不需要碰核心。</p>
+<h2 id="MCP-是扩展点的一部分，但框架只给“裸引擎”"><a href="#MCP-是扩展点的一部分，但框架只给“裸引擎”" class="headerlink" title="MCP 是扩展点的一部分，但框架只给“裸引擎”"></a>MCP 是扩展点的一部分，但框架只给“裸引擎”</h2><p>如果 Harness 核心里直接写死一份固定 MCP server 清单，比如默认连 GitHub、文件系统、数据库三个 server，那使用者就只能用这三个服务，没法换成公司内部自建的 MCP server；除非直接 fork 核心代码，把写死的部分改掉。这就像是出厂就把插头焊死在三个插座上，想接别的插座只能把电线剪断，再把自己的线接上去。框架本身只提供一个会说 MCP 协议的插头，具体接哪个 server 应该留给插件层去决定，而不是在核心里写死。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://deepseek-harness.github.io/deepseek-harness/en/guide/providers">Configure models · DeepSeek Harness</a><br>—— 自定义 provider 的配置字段（<code>baseURL</code> &#x2F; <code>api: openai-completions</code> &#x2F; <code>apiKeyEnv</code> &#x2F; <code>models[].id</code>）</li>
+<li><a target="_blank" rel="noopener" href="https://deepseek-harness.github.io/deepseek-harness/en/reference/cordis-primer">Cordis Primer · DeepSeek Harness</a><br>—— Cordis 的 services &#x2F; events 机制</li>
+</ul>
+<p>⚠️ 只有上面这两处是<strong>打开官方文档逐字核对过</strong>的。文中其余关于 Harness 的说法来自写作时<br>检索到的二手资料（官方页面、InfoQ、社区文章等），我没有逐条回源。</p>
+<p>「自定义请求头」那一条尤其要说清楚：我查到的是<strong>官方配置文档里没有提到这一项</strong>，<br>不是「它不支持」。<strong>查不到不等于没有。</strong></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://feo-cat.github.io">Feo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://feo-cat.github.io/2026/08/26/everything-is-a-plugin/">https://feo-cat.github.io/2026/08/26/everything-is-a-plugin/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://feo-cat.github.io" target="_blank">Feo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/AI/">AI</a><a class="post-meta__tags" href="/tags/Agent/">Agent</a><a class="post-meta__tags" href="/tags/%E6%8F%92%E4%BB%B6%E6%9E%B6%E6%9E%84/">插件架构</a><a class="post-meta__tags" href="/tags/DeepSeek/">DeepSeek</a></div><div class="post-share"><div class="social-share" data-image="/img/projects/agent-notebook.svg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/08/26/why-gui-agents-are-hard/" title="为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚"><img class="cover" src="/img/projects/agent-notebook.svg" onerror="onerror=null;src='/img/projects/default-cover.svg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚</div></div><div class="info-2"><div class="info-item-1">为什么最强模型碰到 GUI 任务会”逃”去调 API？我理解下来，结构化契约之所以是 agent 可靠行动的前提，是因为它让 agent 知道该按什么格式发请求、哪些字段是什么类型；一旦出错，系统会返回校验结果或错误码，agent 至少能明白自己错了、错在哪。GUI 没有这层合同，按钮在 agent 眼里不过是一块坐标区域。界面一改版，原来的点击路径就...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/06/19/workflow-vs-agent/" title="Workflow 还是 Agent：什么时候该让模型自己决定"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-19</div><div class="info-item-2">Workflow 还是 Agent：什么时候该让模型自己决定</div></div><div class="info-2"><div class="info-item-1"> 这篇是我边搭 daily-copilot 的 multi-agent 写作助手、边想清楚的一个问题：到底什么时候该让模型自己决定流程。文中的例子大多来自这个项目本身。   我以为 Agent 就是更厉害的 Workflow，直到看见这张自主性图谱Workflow 和 Agent 最根本的区别，在于谁来决定流程。Workflow 的编排来自我当初写代码...</div></div></div></a><a class="pagination-related" href="/2026/07/10/first-run-fuse/" title="研究员第一次真跑，就把熔断撞响了"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-10</div><div class="info-item-2">研究员第一次真跑，就把熔断撞响了</div></div><div class="info-2"><div class="info-item-1"> 工作日晚的短文。这周我把写作助手的研究员从「服务端 web_search」换成了手写的 client-side 检索循环（起因是一把失效的 API key，完整改造记之后另写）。本文只记它第一次真跑的 168.8 秒，和一条被撞响的熔断。代码在 daily-copilot。   一组数字选题是很小的一个：「什么是 prompt caching」。研究...</div></div></div></a><a class="pagination-related" href="/2026/06/17/react-from-scratch/" title="不用框架，从零手搓一个 ReAct Agent"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-17</div><div class="info-item-2">不用框架，从零手搓一个 ReAct Agent</div></div><div class="info-2"><div class="info-item-1"> 代码在我的 daily-copilot 项目里：experiments/react_warmup.py（约 180 行，无任何 agent 框架、不用 SDK 原生 tool-use）。   0. 引子：ReAct 是什么我给自己出了道小题：让一个大模型回答「距离项目收尾（2026-08-21）还剩几周零几天？」。 听着简单——直接问它不就完了？可你...</div></div></div></a><a class="pagination-related" href="/2026/08/26/why-gui-agents-are-hard/" title="为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-26</div><div class="info-item-2">为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚</div></div><div class="info-2"><div class="info-item-1">为什么最强模型碰到 GUI 任务会”逃”去调 API？我理解下来，结构化契约之所以是 agent 可靠行动的前提，是因为它让 agent 知道该按什么格式发请求、哪些字段是什么类型；一旦出错，系统会返回校验结果或错误码，agent 至少能明白自己错了、错在哪。GUI 没有这层合同，按钮在 agent 眼里不过是一块坐标区域。界面一改版，原来的点击路径就...</div></div></div></a><a class="pagination-related" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-19</div><div class="info-item-2">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</div></div><div class="info-2"><div class="info-item-1"> 这是写作助手系列的核心篇：为什么、怎么做、代价是什么，一次讲完。有个套娃的事实先交代：这篇的初稿素材，是我用自己的写作助手的「making-of 模式」对我自己做的一场访谈问出来的——而这个模式本身，就诞生于写这篇时的一次翻车（见第四节）。代码在 daily-copilot。   研究员变手搓：为什么我把 server-side 搜索干掉了先说清研究...</div></div></div></a><a class="pagination-related" href="/2026/07/03/backend-patterns-in-agents/" title="实习里学的状态机和工厂，在我的 agent 代码里复活了"><img class="cover" src="/img/projects/agent-notebook.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-03</div><div class="info-item-2">实习里学的状态机和工厂，在我的 agent 代码里复活了</div></div><div class="info-2"><div class="info-item-1"> 这是一篇工作日晚的短文。白天在公司实习写 Go 后端，晚上回来搓 daily-copilot 的 multi-agent 写作助手，两边代码看多了，我在 agent 这边认出了两个实习里的老朋友。涉及实习的部分已脱敏，只留下模式本身。   我以为这些模式会留在公司代码库里做 agent 项目之前，我隐约觉得业务后端那套——状态流转、注册分发——和「让...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Feo</div><div class="author-info-description">Feo。代码、AI、视觉与安静记录。</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Feo-cat"><i class="fab fa-github"></i><span>GitHub</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 Feo 的个人笔记。内容还不多，但会慢慢认真长出来。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%80%9C%E6%B2%A1%E6%9C%89%E7%89%B9%E6%9D%83%E6%A0%B8%E5%BF%83%E5%8F%AF%E4%BF%AE%E8%A1%A5%E2%80%9D%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D"><span class="toc-number">1.</span> <span class="toc-text">“没有特权核心可修补”到底是什么意思</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cordis-%E5%85%83%E6%A1%86%E6%9E%B6%EF%BC%9A%E6%8F%92%E4%BB%B6%E4%B9%8B%E9%97%B4%E9%9D%A0%E4%BB%80%E4%B9%88%E5%8D%8F%E4%BD%9C"><span class="toc-number">2.</span> <span class="toc-text">Cordis 元框架：插件之间靠什么协作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%8A%E6%A8%A1%E5%9E%8B%E3%80%81%E5%B7%A5%E5%85%B7%E3%80%81%E6%B2%99%E7%AE%B1%E3%80%81Agent-Loop-%E5%85%A8%E9%83%A8%E9%99%8D%E7%BA%A7%E4%B8%BA%E6%8F%92%E4%BB%B6"><span class="toc-number">3.</span> <span class="toc-text">把模型、工具、沙箱、Agent Loop 全部降级为插件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA-npm-%E5%8C%85%E5%B0%B1%E6%98%AF%E4%B8%80%E4%B8%AA%E6%8F%92%E4%BB%B6%EF%BC%9A%E5%A3%B0%E6%98%8E%E5%BC%8F%E8%A3%85%E9%85%8D%E8%A7%84%E5%88%99"><span class="toc-number">4.</span> <span class="toc-text">一个 npm 包就是一个插件：声明式装配规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MCP-%E6%98%AF%E6%89%A9%E5%B1%95%E7%82%B9%E7%9A%84%E4%B8%80%E9%83%A8%E5%88%86%EF%BC%8C%E4%BD%86%E6%A1%86%E6%9E%B6%E5%8F%AA%E7%BB%99%E2%80%9C%E8%A3%B8%E5%BC%95%E6%93%8E%E2%80%9D"><span class="toc-number">5.</span> <span class="toc-text">MCP 是扩展点的一部分，但框架只给“裸引擎”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">6.</span> <span class="toc-text">参考</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/26/everything-is-a-plugin/" title="DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里"/></a><div class="content"><a class="title" href="/2026/08/26/everything-is-a-plugin/" title="DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里">DeepSeek Harness 的「一切皆插件」：一个 agent 运行时该把扩展点留在哪里</a><time datetime="2026-08-26T05:30:00.000Z" title="发表于 2026-08-26 13:30:00">2026-08-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/26/why-gui-agents-are-hard/" title="为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚"/></a><div class="content"><a class="title" href="/2026/08/26/why-gui-agents-are-hard/" title="为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚">为什么 GUI agent 比 API agent 难：没有契约、状态不可见、动作不可回滚</a><time datetime="2026-08-26T05:00:00.000Z" title="发表于 2026-08-26 13:00:00">2026-08-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环"/></a><div class="content"><a class="title" href="/2026/07/19/client-side-react-loop/" title="我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环">我把研究员从服务端搜索，手搓成了 client-side ReAct 检索循环</a><time datetime="2026-07-19T14:30:00.000Z" title="发表于 2026-07-19 22:30:00">2026-07-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手"><img src="/img/projects/agent-notebook.svg" onerror="this.onerror=null;this.src='/img/projects/default-cover.svg'" alt="事实核查员的第一场考试，和裸模型打了个平手"/></a><div class="content"><a class="title" href="/2026/07/19/crag-first-exam/" title="事实核查员的第一场考试，和裸模型打了个平手">事实核查员的第一场考试，和裸模型打了个平手</a><time datetime="2026-07-19T13:00:00.000Z" title="发表于 2026-07-19 21:00:00">2026-07-19</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
