@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Workflow 与 Agent：铁轨和指南针</title>
+  <desc id="desc">一列小火车沿固定铁轨前进，一辆带着指南针的越野车在岔路前选择方向。</desc>
+
+  <rect width="800" height="480" fill="#f0ece3"/>
+  <circle cx="400" cy="238" r="196" fill="#d4a27f" opacity="0.16"/>
+  <circle cx="400" cy="238" r="196" stroke="#a8472a" stroke-width="2" opacity="0.24"/>
+
+  <!-- Workflow: a train follows rails laid in advance. -->
+  <g stroke="#5c554d" stroke-linecap="round">
+    <path d="M72 349H346" stroke-width="5" opacity="0.72"/>
+    <path d="M72 376H346" stroke-width="5" opacity="0.72"/>
+    <g stroke-width="7" opacity="0.42">
+      <path d="M94 340L94 385"/>
+      <path d="M132 340L132 385"/>
+      <path d="M170 340L170 385"/>
+      <path d="M208 340L208 385"/>
+      <path d="M246 340L246 385"/>
+      <path d="M284 340L284 385"/>
+      <path d="M322 340L322 385"/>
+    </g>
+  </g>
+
+  <g>
+    <rect x="119" y="244" width="122" height="70" rx="22" fill="#c15f3c"/>
+    <path d="M219 207H292V314H219Z" fill="#a8472a"/>
+    <rect x="235" y="222" width="40" height="31" rx="4" fill="#f0ece3" opacity="0.9"/>
+    <path d="M139 213H174V248H139Z" fill="#a8472a"/>
+    <path d="M132 207H181" stroke="#a8472a" stroke-width="10" stroke-linecap="round"/>
+    <path d="M117 282H92L111 308H125" fill="#dd8a66"/>
+    <path d="M292 274H314V309H292" fill="#dd8a66"/>
+    <circle cx="154" cy="320" r="24" fill="#5c554d"/>
+    <circle cx="154" cy="320" r="10" fill="#d4a27f"/>
+    <circle cx="256" cy="320" r="24" fill="#5c554d"/>
+    <circle cx="256" cy="320" r="10" fill="#d4a27f"/>
+    <circle cx="152" cy="174" r="13" fill="#d4a27f" opacity="0.62"/>
+    <circle cx="124" cy="150" r="8" fill="#d4a27f" opacity="0.42"/>
+  </g>
+
+  <!-- Agent: an off-road vehicle can choose after reaching a fork. -->
+  <g stroke="#b7a38e" stroke-width="30" stroke-linecap="round" opacity="0.5">
+    <path d="M411 384C470 359 536 331 602 299"/>
+    <path d="M602 299C654 267 696 224 742 168"/>
+    <path d="M602 299C663 310 706 340 756 382"/>
+  </g>
+  <g stroke="#f0ece3" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 13" opacity="0.9">
+    <path d="M416 384C479 357 540 330 602 299"/>
+    <path d="M602 299C654 267 696 224 742 168"/>
+    <path d="M602 299C663 310 706 340 756 382"/>
+  </g>
+
+  <g>
+    <path d="M438 294L468 252H562L594 282L624 290V326H423V308L438 294Z" fill="#dd8a66"/>
+    <path d="M481 252L503 215H559L581 252H481Z" fill="#c15f3c"/>
+    <path d="M510 226H550L563 252H495L510 226Z" fill="#f0ece3" opacity="0.9"/>
+    <rect x="433" y="281" width="40" height="15" rx="7.5" fill="#f4efe7" opacity="0.78"/>
+    <circle cx="467" cy="326" r="25" fill="#5c554d"/>
+    <circle cx="467" cy="326" r="10" fill="#d4a27f"/>
+    <circle cx="581" cy="326" r="25" fill="#5c554d"/>
+    <circle cx="581" cy="326" r="10" fill="#d4a27f"/>
+  </g>
+
+  <g>
+    <circle cx="616" cy="191" r="48" fill="#fffaf1" stroke="#a8472a" stroke-width="5"/>
+    <circle cx="616" cy="191" r="35" stroke="#d4a27f" stroke-width="2"/>
+    <path d="M628 165L620 196L594 216L609 185L628 165Z" fill="#c15f3c"/>
+    <circle cx="616" cy="191" r="6" fill="#5c554d"/>
+    <path d="M616 137V145M616 237V245M562 191H570M662 191H670" stroke="#5c554d" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  </g>
+
+  <circle cx="724" cy="92" r="11" fill="#5c554d" opacity="0.5"/>
+  <circle cx="78" cy="412" r="7" fill="#dd8a66" opacity="0.8"/>
+</svg>

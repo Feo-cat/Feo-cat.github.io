@@ -1,16 +1,14 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>笔记 / Wiki | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="笔记 &#x2F; Wiki     一个用来长期积累、反复回看的知识库。     这里会放更长期有效的技术笔记：概念、调试路径、论文阅读、常用命令和设计决策。                   计算机视觉       位姿估计       坐标系、相机内参、3D 边界框、评估指标和可视化方法。                 AI 工程       Agent 与工具       工具调">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>笔记 | Feo</title><meta name="author" content="Feo"><meta name="copyright" content="Feo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F4EFE7"><meta name="description" content="一个用来长期积累、反复回看的知识库。">
 <meta property="og:type" content="website">
-<meta property="og:title" content="笔记 &#x2F; Wiki">
+<meta property="og:title" content="笔记">
 <meta property="og:url" content="https://feo-cat.github.io/notes/index.html">
 <meta property="og:site_name" content="Feo">
-<meta property="og:description" content="笔记 &#x2F; Wiki     一个用来长期积累、反复回看的知识库。     这里会放更长期有效的技术笔记：概念、调试路径、论文阅读、常用命令和设计决策。                   计算机视觉       位姿估计       坐标系、相机内参、3D 边界框、评估指标和可视化方法。                 AI 工程       Agent 与工具       工具调">
+<meta property="og:description" content="一个用来长期积累、反复回看的知识库。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://feo-cat.github.io/img/butterfly-icon.png">
-<meta property="article:published_time" content="2026-05-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-14T15:52:18.617Z">
 <meta property="article:author" content="Feo">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://feo-cat.github.io/img/butterfly-icon.png"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://feo-cat.github.io/notes/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+<meta name="twitter:image" content="https://feo-cat.github.io/img/butterfly-icon.png"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/feo-mark.svg"><link rel="canonical" href="https://feo-cat.github.io/notes/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
     (() => {
       
     const saveToLocal = {
@@ -65,26 +63,6 @@
     }
   
       
-      const activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#2A241F')
-        }
-      }
-      const activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F4EFE7')
-        }
-      }
-
-      btf.activateDarkMode = activateDarkMode
-      btf.activateLightMode = activateLightMode
-
-      const theme = saveToLocal.get('theme')
-    
-          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
-        
       
       const asideStatus = saveToLocal.get('aside-status')
       if (asideStatus !== undefined) {
@@ -139,38 +117,71 @@
   },
   autoDarkmode: false
 }</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '笔记 / Wiki',
+  title: '笔记',
   isHighlightShrink: false,
   isToc: false,
   pageType: 'page'
-}</script><link rel="stylesheet" href="/css/custom.css?v=20260615-anthropic-v3"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">笔记 / Wiki</h1></header><main class="layout hide-aside" id="content-inner"><div id="page"><div class="page-title">笔记 / Wiki</div><div class="container" id="article-container"><div class="module-page notes-page">
-  <section class="module-hero">
-    <p class="eyebrow">笔记 / Wiki</p>
-    <h1>一个用来长期积累、反复回看的知识库。</h1>
-    <p class="lede">这里会放更长期有效的技术笔记：概念、调试路径、论文阅读、常用命令和设计决策。</p>
-  </section>
-
-  <section class="wiki-grid">
-    <article>
-      <p class="eyebrow">计算机视觉</p>
-      <h2>位姿估计</h2>
-      <p>坐标系、相机内参、3D 边界框、评估指标和可视化方法。</p>
-    </article>
-    <article>
-      <p class="eyebrow">AI 工程</p>
-      <h2>Agent 与工具</h2>
-      <p>工具调用、MCP 服务、Prompt 模板、评估循环和工作流设计笔记。</p>
-    </article>
-    <article>
-      <p class="eyebrow">系统实践</p>
-      <h2>调试手册</h2>
-      <p>环境配置、可复现性、数据集检查、Windows 与 Python 工作流记录。</p>
-    </article>
-    <article>
-      <p class="eyebrow">阅读</p>
-      <h2>论文笔记</h2>
-      <p>简短摘要、开放问题、实现细节和后续实验想法。</p>
-    </article>
-  </section>
-</div>
-</div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+}</script><link rel="stylesheet" href="/css/custom.css?v=20260829-content-hubs-v2"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">24</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Feo</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/blog/"><i class="fa-fw fas fa-book-open"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/projects/"><i class="fa-fw fas fa-layer-group"></i><span> 项目</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-note-sticky"></i><span> 笔记</span></a></div><div class="menus_item"><a class="site-page" href="/timeline/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/ai-lab/"><i class="fa-fw fas fa-flask"></i><span> AI 实验室</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">笔记</h1></header><main class="layout hide-aside" id="content-inner"><div id="page"><div class="page-title">笔记</div><div class="container" id="article-container"><div class="module-page content-hub notes-hub">
+    <section class="module-hero content-hub-hero">
+      <p class="eyebrow">笔记 / Wiki · 3 篇</p>
+      <h1>一个用来长期积累、反复回看的知识库。</h1>
+      <p class="lede">更偏速查和持续更新：概念、配置、命令，以及真实使用时容易忘记的边界。</p>
+      <nav class="content-switch" aria-label="内容类型">
+    <a class="" href="&#x2F;blog&#x2F;">文章<span>9</span></a><a class="is-active" href="&#x2F;notes&#x2F;" aria-current="page">笔记<span>3</span></a>
+  </nav>
+    </section>
+    <section class="content-catalog notes-catalog" aria-labelledby="notes-catalog-title">
+      <div class="content-section-heading">
+        <div>
+          <p class="eyebrow">后端与基础设施</p>
+          <h2 id="notes-catalog-title">最近整理</h2>
+        </div>
+        <p class="catalog-note">笔记优先显示更新时间，内容会随着实践继续补充。</p>
+      </div>
+      <div class="content-entry-list note-entry-list">
+        <article class="content-entry note-entry">
+    <a class="content-entry-media" href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;Gin-note&#x2F;" tabindex="-1" aria-hidden="true">
+      <img src="&#x2F;img&#x2F;projects&#x2F;gin-note.svg" alt="Gin 入门学习笔记：先把一个 API 跑起来" width="800" height="480" loading="lazy">
+    </a>
+    <div class="content-entry-copy">
+      <div class="entry-meta">
+    <time datetime="2026-05-17">更新于 2026-05-17</time>
+    <a href="&#x2F;categories&#x2F;%E5%90%8E%E7%AB%AF%E4%B8%8E%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD&#x2F;">后端与基础设施</a>
+    
+  </div>
+      <h2><a href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;Gin-note&#x2F;">Gin 入门学习笔记：先把一个 API 跑起来</a></h2>
+      <p>从最小 API 开始，整理 Gin 的路由、参数、JSON、中间件、路由分组与项目结构。</p>
+      <a class="entry-link" href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;Gin-note&#x2F;">打开笔记 <span aria-hidden="true">→</span></a>
+    </div>
+  </article><article class="content-entry note-entry">
+    <a class="content-entry-media" href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;k8s-note&#x2F;" tabindex="-1" aria-hidden="true">
+      <img src="&#x2F;img&#x2F;projects&#x2F;k8s-note.svg" alt="Kubernetes（K8s）入门笔记" width="800" height="480" loading="lazy">
+    </a>
+    <div class="content-entry-copy">
+      <div class="entry-meta">
+    <time datetime="2026-05-17">更新于 2026-05-17</time>
+    <a href="&#x2F;categories&#x2F;%E5%90%8E%E7%AB%AF%E4%B8%8E%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD&#x2F;">后端与基础设施</a>
+    
+  </div>
+      <h2><a href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;k8s-note&#x2F;">Kubernetes（K8s）入门笔记</a></h2>
+      <p>用 Pod、Deployment 和 Service 建立 Kubernetes 入门认知，并整理常用的 kubectl 命令。</p>
+      <a class="entry-link" href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;k8s-note&#x2F;">打开笔记 <span aria-hidden="true">→</span></a>
+    </div>
+  </article><article class="content-entry note-entry">
+    <a class="content-entry-media" href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;Nginx-note&#x2F;" tabindex="-1" aria-hidden="true">
+      <img src="&#x2F;img&#x2F;projects&#x2F;nginx-note.svg" alt="Nginx 入门笔记" width="800" height="480" loading="lazy">
+    </a>
+    <div class="content-entry-copy">
+      <div class="entry-meta">
+    <time datetime="2026-05-17">更新于 2026-05-17</time>
+    <a href="&#x2F;categories&#x2F;%E5%90%8E%E7%AB%AF%E4%B8%8E%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD&#x2F;">后端与基础设施</a>
+    
+  </div>
+      <h2><a href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;Nginx-note&#x2F;">Nginx 入门笔记</a></h2>
+      <p>整理 Nginx 作为静态服务器、反向代理和负载均衡器的基本用法，以及常用命令与配置位置。</p>
+      <a class="entry-link" href="&#x2F;2026&#x2F;05&#x2F;17&#x2F;Nginx-note&#x2F;">打开笔记 <span aria-hidden="true">→</span></a>
+    </div>
+  </article>
+      </div>
+    </section>
+  </div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Feo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"></div><div id="rightside-config-show"><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
