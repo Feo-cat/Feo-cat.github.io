@@ -387,6 +387,44 @@ a:visited {
   text-shadow: none;
 }
 
+.note-detail-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 10px !important;
+}
+
+#post-info .note-back-link,
+#post-info .note-back-link:visited {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  text-shadow: none;
+}
+
+#post-info .note-back-link:hover {
+  color: #a64d2e;
+}
+
+#post-info .note-detail-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 7px;
+  color: var(--ink-muted);
+}
+
+#post-info .note-detail-facts .post-meta-separator {
+  margin: 0 4px;
+}
+
 /* Footer and mobile drawer */
 #footer {
   background: var(--paper) !important;
@@ -1129,6 +1167,39 @@ a:visited {
   border-radius: 999px;
 }
 
+.note-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 1px 8px;
+  border: 1px solid var(--paper-line);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.note-status--seed {
+  background: var(--paper-soft);
+  color: var(--ink-muted);
+}
+
+.note-status--growing {
+  border-color: rgba(193, 95, 60, 0.24);
+  background: rgba(193, 95, 60, 0.08);
+  color: var(--accent);
+}
+
+.note-status--stable {
+  border-color: rgba(79, 118, 97, 0.24);
+  background: rgba(79, 118, 97, 0.08);
+  color: #4f7661;
+}
+
+.note-tested-with {
+  color: var(--ink-soft);
+}
+
 #article-container .entry-link,
 #article-container .entry-link:visited {
   display: inline-flex;
@@ -1248,6 +1319,14 @@ a:visited {
 
 .note-entry-list {
   max-width: 930px;
+}
+
+.note-group + .note-group {
+  margin-top: 64px;
+}
+
+.note-empty {
+  justify-self: start;
 }
 
 .content-pagination {
@@ -1371,6 +1450,10 @@ a:visited {
   .content-entry .entry-series,
   .content-entry .entry-link {
     display: none !important;
+  }
+
+  .note-group + .note-group {
+    margin-top: 48px;
   }
 
   .content-pagination {
